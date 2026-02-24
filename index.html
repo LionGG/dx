@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>A股市场短线情绪走势</title>
+    <title>A股短线情绪复盘-Billy's Claw</title>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; background: #0d1117; color: #c9d1d9; min-height: 100vh; padding: 12px; }
         .container { max-width: 1400px; margin: 0 auto; }
         .header { text-align: center; margin-bottom: 16px; padding: 12px 0; border-bottom: 1px solid #30363d; }
-        .header h1 { font-size: 20px; color: #58a6ff; font-weight: 600; }
+        .header h1 { font-size: 20px; color: #58a6ff; font-weight: 600; display: none; }
         .chart-container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
         .chart-title { font-size: 15px; color: #c9d1d9; font-weight: 600; margin-bottom: 12px; padding-left: 8px; border-left: 3px solid #58a6ff; display: flex; justify-content: space-between; align-items: center; }
         .index-selector { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
+        .index-selector option { background: #161b22; color: #c9d1d9; }
         #klineChart { width: 100%; height: 320px; }
         #sentimentChart, #strengthChart { width: 100%; height: 260px; }
         .data-table { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -28,26 +29,45 @@
         .emotion-ice { color: #238636; font-weight: 600; }
         .up-red { color: #f85149; }
         .down-green { color: #238636; }
-        .footer { text-align: center; padding: 16px; margin-top: 16px; font-size: 12px; color: #6e7681; }
+        .footer { text-align: center; padding: 8px; margin-top: 8px; font-size: 12px; color: #6e7681; }
         
         /* 日期切换器样式 */
-        .date-switcher { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px; }
-        .date-arrow { width: 32px; height: 32px; border-radius: 50%; background: #21262d; border: 1px solid #30363d; color: #c9d1d9; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .date-arrow:hover { background: #30363d; color: #58a6ff; }
-        .date-arrow:disabled { opacity: 0.3; cursor: not-allowed; }
-        .date-display { font-size: 15px; font-weight: 600; color: #c9d1d9; min-width: 140px; text-align: center; }
-        
-        /* AI分析卡片样式 */
-        .analysis-section { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-        .analysis-section h3 { font-size: 15px; color: #c9d1d9; margin-bottom: 12px; font-weight: 600; padding-left: 8px; border-left: 3px solid #58a6ff; }
-        .analysis-card { background: #21262d; border-radius: 8px; padding: 12px; margin-bottom: 10px; }
-        .analysis-card .date { font-size: 13px; color: #8b949e; margin-bottom: 6px; }
-        .analysis-card .phase { font-size: 15px; color: #f0883e; font-weight: 600; margin-bottom: 6px; }
-        .analysis-card .action { font-size: 12px; color: #c9d1d9; margin-bottom: 6px; line-height: 1.5; }
-        .analysis-card .summary { font-size: 13px; color: #58a6ff; font-weight: 500; margin-bottom: 6px; }
-        .analysis-card .link { font-size: 11px; }
-        .analysis-card .link a { color: #238636; text-decoration: none; }
-        .analysis-card .link a:hover { text-decoration: underline; }
+        .date-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .date-arrow {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .date-arrow:hover {
+            background: #30363d;
+            color: #58a6ff;
+        }
+        .date-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .date-display {
+            font-size: 15px;
+            font-weight: 600;
+            color: #c9d1d9;
+            min-width: 140px;
+            text-align: center;
+        }
         
         /* 大屏双栏布局 */
         @media (min-width: 1024px) {
@@ -57,185 +77,851 @@
             .card-container { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; }
             .card-title { font-size: 16px; color: #c9d1d9; font-weight: 600; margin-bottom: 15px; padding-left: 8px; border-left: 3px solid #58a6ff; }
         }
+        
+        /* 平板适配 */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body { padding: 20px; }
+            .header h1 { font-size: 24px; }
+            .header { margin-bottom: 24px; padding: 16px 0; }
+            .chart-container { padding: 20px; margin-bottom: 20px; }
+            .chart-title { font-size: 16px; margin-bottom: 15px; }
+            #klineChart { height: 400px; }
+            #sentimentChart, #strengthChart { height: 310px; }
+            .data-table { padding: 20px; }
+            .data-table h3 { font-size: 16px; margin-bottom: 15px; }
+            table { font-size: 12px; }
+            th, td { padding: 10px 8px; }
+        }
+        
+        /* 小屏手机适配 */
+        @media (max-width: 375px) {
+            body { padding: 8px; }
+            .header h1 { font-size: 18px; }
+            #klineChart { height: 280px; }
+            #sentimentChart, #strengthChart { height: 220px; }
+            table { font-size: 10px; }
+            th, td { padding: 6px 4px; }
+        }
+        
+        /* 查看完整研判链接 */
+        .report-link {
+            display: inline-block;
+            font-size: 12px;
+            color: #8b949e;
+            text-decoration: none;
+            margin-top: 8px;
+            transition: color 0.2s;
+        }
+        .report-link:hover {
+            color: #58a6ff;
+        }
+        .report-section { margin-bottom: 16px; }
+        .report-section h4 { color: #58a6ff; font-size: 14px; margin-bottom: 8px; }
+        .report-section p { color: #c9d1d9; font-size: 13px; line-height: 1.6; }
+        .report-section .highlight { color: #f0883e; font-weight: 600; }
+        #dailyReport { margin-top: 12px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header"><h1>A股市场短线情绪走势</h1></div>
-        
-        <!-- 日期切换器 -->
-        <div class="date-switcher">
-            <button class="date-arrow" id="prevDate">&lt;</button>
-            <div class="date-display" id="dateDisplay">加载中...</div>
-            <button class="date-arrow" id="nextDate">&gt;</button>
-        </div>
-        
-        <!-- K线图 -->
-        <div class="chart-container">
-            <div class="chart-title">
-                <span>东财全A指数</span>
-                <select class="index-selector" id="indexSelector">
-                    <option value="000985">东财全A</option>
-                    <option value="000001">上证指数</option>
-                    <option value="399006">创业板指</option>
-                </select>
+        <!-- 第一行：情绪走势 + 每日研判 -->
+        <div class="row">
+            <div class="chart-container">
+                <div class="chart-title">短线情绪</div>
+                <div id="sentimentChart"></div>
             </div>
-            <div id="klineChart"></div>
+            <div class="card-container">
+                <div id="dailyReport">
+                    <div class="report-card" id="reportCard">
+                        <div class="date-switcher">
+                            <button class="date-arrow" id="prevDate" onclick="switchReport(1)">‹</button>
+                            <span class="date-display" id="dateDisplay">2026-02-13</span>
+                            <button class="date-arrow" id="nextDate" onclick="switchReport(-1)">›</button>
+                        </div>
+                        <div class="card-title">情绪研判</div>
+                        <div class="report-content" id="reportContent">
+                            <div class="report-section">
+                                <h4>周期定位</h4>
+                                <p id="reportPhase">加载中...</p>
+                            </div>
+                            <div class="report-section">
+                                <h4>操作方向</h4>
+                                <p id="reportAction">加载中...</p>
+                            </div>
+                            <div class="report-section">
+                                <h4>一句话总结</h4>
+                                <p id="reportSummary" class="highlight">加载中...</p>
+                            </div>
+                            <a id="reportLink" href="#" target="_blank" class="report-link">查看完整内容>></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
-        <!-- 情绪图 -->
-        <div class="chart-container">
-            <div class="chart-title">短线情绪走势图</div>
-            <div id="sentimentChart"></div>
+        <!-- 第二行：K线图 + 指数数据 -->
+        <div class="row">
+            <div class="chart-container">
+                <div class="chart-title">
+                    <span>指数K线</span>
+                    <select id="indexSelector" class="index-selector">
+                        <option value="000001">上证指数</option>
+                        <option value="399006">创业板指</option>
+                    </select>
+                </div>
+                <div id="klineChart"></div>
+            </div>
+            <div class="card-container">
+                <div class="card-title">数据详情</div>
+                <div id="indexMarketData">
+                    <div class="report-section">
+                        <h4>上证指数</h4>
+                        <p id="dataIndexCloseChange">加载中...</p>
+                    </div>
+                    <div class="report-section">
+                        <h4>成交额</h4>
+                        <p id="dataVolume">加载中...</p>
+                    </div>
+                    <div class="report-section">
+                        <h4>涨跌家数</h4>
+                        <p id="dataUpDownCountRatio">加载中...</p>
+                    </div>
+                    <div class="report-section">
+                        <h4>涨停/跌停</h4>
+                        <p id="dataLimitUpDown">加载中...</p>
+                    </div>
+                    <div class="report-section">
+                        <h4>连板高度</h4>
+                        <p id="dataConsecutiveHeight">加载中...</p>
+                    </div>
+                    
+                    <a href="#" onclick="showFullTable(); return false;" class="report-link" style="margin-top: 12px;">全部数据&gt;&gt;</a>
+                </div>
+            </div>
         </div>
         
-        <!-- AI分析结论 -->
-        <div class="analysis-section">
-            <h3>AI情绪研判</h3>
-            <div id="analysisList"></div>
+        <!-- 第三行：趋势强度（板块分析已隐藏） -->
+        <div class="row" style="display: none;">
+            <div class="chart-container" style="flex: 1;">
+                <div class="chart-title">中期趋势</div>
+                <div id="strengthChart"></div>
+            </div>
         </div>
         
-        <!-- 数据表格 -->
-        <div class="data-table">
-            <h3>历史数据明细（13项指标）</h3>
+        <!-- 完整数据表格（默认隐藏，点击展开） -->
+        <div id="fullTableContainer" class="data-table" style="display: none;">
+            <h3>历史数据明细 <button onclick="hideFullTable()" style="float: right; background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">收起</button></h3>
             <table id="dataTable">
                 <thead>
                     <tr>
                         <th>日期</th><th>情绪</th><th>量能</th><th>上涨</th><th>下跌</th>
                         <th>涨停</th><th>跌停</th><th>大幅回撤</th><th>连板高度</th><th>连板表现</th>
-                        <th>连板晋级率</th><th>涨停表现</th><th>封板率</th>
+                        <th>连板晋级率</th><th>涨停表现</th><th>封板率</th><!-- <th>MA50占比</th><th>强势股</th> -->
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
-        
-        <div class="footer">数据更新于：2026-02-24 16:57</div>
+        <div class="footer">Powered by Billy's Claw | WeChat: tianbao</div>
     </div>
 
     <script>
-        const marketData = [{"date": "2026-02-24", "sentiment_index": 63, "limit_up": 92, "limit_down": 15, "major_pullback": 2, "volume": 22021.0, "consecutive_height": 4, "up_count": 3764, "down_count": 1344, "seal_rate": "69.2%", "limit_up_performance": "1.89%", "consecutive_performance": "2.01%", "consecutive_promotion_rate": "21.9%"}, {"date": "2026-02-13", "sentiment_index": 35, "limit_up": 32, "limit_down": 12, "major_pullback": 6, "volume": 19827.0, "consecutive_height": 5, "up_count": 1430, "down_count": 3653, "seal_rate": "74.4%", "limit_up_performance": "-1.04%", "consecutive_performance": "-0.90%", "consecutive_promotion_rate": "8.3%"}, {"date": "2026-02-12", "sentiment_index": 53, "limit_up": 60, "limit_down": 13, "major_pullback": 2, "volume": 21417.0, "consecutive_height": 4, "up_count": 1995, "down_count": 3109, "seal_rate": "75.9%", "limit_up_performance": "2.46%", "consecutive_performance": "1.62%", "consecutive_promotion_rate": "33.3%"}, {"date": "2026-02-11", "sentiment_index": 45, "limit_up": 51, "limit_down": 5, "major_pullback": 9, "volume": 19843.0, "consecutive_height": 4, "up_count": 1977, "down_count": 3030, "seal_rate": "75.0%", "limit_up_performance": "0.12%", "consecutive_performance": "3.25%", "consecutive_promotion_rate": "18.3%"}, {"date": "2026-02-10", "sentiment_index": 54, "limit_up": 60, "limit_down": 2, "major_pullback": 4, "volume": 21055.0, "consecutive_height": 3, "up_count": 2151, "down_count": 2884, "seal_rate": "88.2%", "limit_up_performance": "2.86%", "consecutive_performance": "-0.11%", "consecutive_promotion_rate": "25.3%"}, {"date": "2026-02-09", "sentiment_index": 74, "limit_up": 83, "limit_down": 3, "major_pullback": 1, "volume": 22495.0, "consecutive_height": 5, "up_count": 4372, "down_count": 717, "seal_rate": "76.9%", "limit_up_performance": "3.45%", "consecutive_performance": "4.97%", "consecutive_promotion_rate": "25.5%"}, {"date": "2026-02-06", "sentiment_index": 48, "limit_up": 55, "limit_down": 5, "major_pullback": 6, "volume": 21457.0, "consecutive_height": 4, "up_count": 2574, "down_count": 2444, "seal_rate": "67.9%", "limit_up_performance": "0.31%", "consecutive_performance": "4.48%", "consecutive_promotion_rate": "18.2%"}, {"date": "2026-02-05", "sentiment_index": 40, "limit_up": 44, "limit_down": 15, "major_pullback": 4, "volume": 21762.0, "consecutive_height": 4, "up_count": 1588, "down_count": 3462, "seal_rate": "81.5%", "limit_up_performance": "0.83%", "consecutive_performance": "2.40%", "consecutive_promotion_rate": "14.7%"}, {"date": "2026-02-04", "sentiment_index": 58, "limit_up": 68, "limit_down": 5, "major_pullback": 6, "volume": 24810.0, "consecutive_height": 4, "up_count": 3141, "down_count": 1960, "seal_rate": "78.2%", "limit_up_performance": "3.41%", "consecutive_performance": "3.11%", "consecutive_promotion_rate": "18.8%"}, {"date": "2026-02-03", "sentiment_index": 70, "limit_up": 69, "limit_down": 9, "major_pullback": 0, "volume": 25442.0, "consecutive_height": 4, "up_count": 4583, "down_count": 514, "seal_rate": "79.3%", "limit_up_performance": "4.35%", "consecutive_performance": "5.78%", "consecutive_promotion_rate": "27.8%"}, {"date": "2026-02-02", "sentiment_index": 31, "limit_up": 36, "limit_down": 98, "major_pullback": 3, "volume": 25848.0, "consecutive_height": 3, "up_count": 738, "down_count": 4395, "seal_rate": "66.7%", "limit_up_performance": "0.56%", "consecutive_performance": "3.91%", "consecutive_promotion_rate": "20.8%"}, {"date": "2026-01-30", "sentiment_index": 47, "limit_up": 48, "limit_down": 52, "major_pullback": 12, "volume": 28355.0, "consecutive_height": 5, "up_count": 2360, "down_count": 2703, "seal_rate": "69.6%", "limit_up_performance": "-0.97%", "consecutive_performance": "-1.50%", "consecutive_promotion_rate": "8.5%"}, {"date": "2026-01-29", "sentiment_index": 62, "limit_up": 82, "limit_down": 12, "major_pullback": 9, "volume": 32300.0, "consecutive_height": 8, "up_count": 1718, "down_count": 3363, "seal_rate": "70.7%", "limit_up_performance": "3.07%", "consecutive_performance": "4.87%", "consecutive_promotion_rate": "16.2%"}, {"date": "2026-01-28", "sentiment_index": 53, "limit_up": 80, "limit_down": 5, "major_pullback": 7, "volume": 29654.0, "consecutive_height": 7, "up_count": 1631, "down_count": 3460, "seal_rate": "75.5%", "limit_up_performance": "2.09%", "consecutive_performance": "5.12%", "consecutive_promotion_rate": "18.9%"}, {"date": "2026-01-27", "sentiment_index": 52, "limit_up": 53, "limit_down": 2, "major_pullback": 2, "volume": 28950.0, "consecutive_height": 6, "up_count": 1856, "down_count": 3237, "seal_rate": "74.6%", "limit_up_performance": "2.62%", "consecutive_performance": "4.59%", "consecutive_promotion_rate": "20.0%"}, {"date": "2026-01-26", "sentiment_index": 52, "limit_up": 70, "limit_down": 30, "major_pullback": 18, "volume": 32482.0, "consecutive_height": 5, "up_count": 1538, "down_count": 3547, "seal_rate": "64.2%", "limit_up_performance": "0.23%", "consecutive_performance": "0.40%", "consecutive_promotion_rate": "14.4%"}, {"date": "2026-01-23", "sentiment_index": 96, "limit_up": 104, "limit_down": 0, "major_pullback": 2, "volume": 30852.0, "consecutive_height": 18, "up_count": 3707, "down_count": 1336, "seal_rate": "85.0%", "limit_up_performance": "2.34%", "consecutive_performance": "1.38%", "consecutive_promotion_rate": "17.8%"}, {"date": "2026-01-22", "sentiment_index": 86, "limit_up": 73, "limit_down": 2, "major_pullback": 3, "volume": 26917.0, "consecutive_height": 17, "up_count": 3373, "down_count": 1696, "seal_rate": "73.5%", "limit_up_performance": "3.19%", "consecutive_performance": "4.46%", "consecutive_promotion_rate": "21.5%"}, {"date": "2026-01-21", "sentiment_index": 77, "limit_up": 79, "limit_down": 4, "major_pullback": 1, "volume": 26006.0, "consecutive_height": 16, "up_count": 2962, "down_count": 2045, "seal_rate": "75.7%", "limit_up_performance": "2.15%", "consecutive_performance": "3.20%", "consecutive_promotion_rate": "14.8%"}, {"date": "2026-01-20", "sentiment_index": 67, "limit_up": 54, "limit_down": 16, "major_pullback": 5, "volume": 27777.0, "consecutive_height": 15, "up_count": 2139, "down_count": 2918, "seal_rate": "77.9%", "limit_up_performance": "2.50%", "consecutive_performance": "3.80%", "consecutive_promotion_rate": "14.8%"}, {"date": "2026-01-19", "sentiment_index": 80, "limit_up": 88, "limit_down": 23, "major_pullback": 6, "volume": 27083.0, "consecutive_height": 14, "up_count": 3408, "down_count": 1664, "seal_rate": "81.3%", "limit_up_performance": "2.72%", "consecutive_performance": "2.17%", "consecutive_promotion_rate": "19.0%"}, {"date": "2026-01-16", "sentiment_index": 49, "limit_up": 58, "limit_down": 46, "major_pullback": 13, "volume": 30262.0, "consecutive_height": 5, "up_count": 2251, "down_count": 2807, "seal_rate": "59.8%", "limit_up_performance": "-0.32%", "consecutive_performance": "-3.04%", "consecutive_promotion_rate": "10.9%"}, {"date": "2026-01-15", "sentiment_index": 52, "limit_up": 55, "limit_down": 63, "major_pullback": 22, "volume": 29055.0, "consecutive_height": 4, "up_count": 2168, "down_count": 2898, "seal_rate": "75.3%", "limit_up_performance": "-2.33%", "consecutive_performance": "-1.23%", "consecutive_promotion_rate": "15.7%"}, {"date": "2026-01-14", "sentiment_index": 70, "limit_up": 102, "limit_down": 14, "major_pullback": 10, "volume": 39414.0, "consecutive_height": 5, "up_count": 2562, "down_count": 2493, "seal_rate": "62.7%", "limit_up_performance": "3.96%", "consecutive_performance": "5.81%", "consecutive_promotion_rate": "30.3%"}, {"date": "2026-01-13", "sentiment_index": 76, "limit_up": 66, "limit_down": 49, "major_pullback": 76, "volume": 36510.0, "consecutive_height": 13, "up_count": 1519, "down_count": 3547, "seal_rate": "52.4%", "limit_up_performance": "1.01%", "consecutive_performance": "2.70%", "consecutive_promotion_rate": "15.8%"}, {"date": "2026-01-12", "sentiment_index": 100, "limit_up": 183, "limit_down": 3, "major_pullback": 4, "volume": 36014.0, "consecutive_height": 12, "up_count": 3871, "down_count": 1167, "seal_rate": "79.1%", "limit_up_performance": "6.40%", "consecutive_performance": "8.60%", "consecutive_promotion_rate": "46.8%"}, {"date": "2026-01-09", "sentiment_index": 88, "limit_up": 94, "limit_down": 1, "major_pullback": 9, "volume": 31227.0, "consecutive_height": 11, "up_count": 3718, "down_count": 1271, "seal_rate": "66.7%", "limit_up_performance": "3.05%", "consecutive_performance": "5.13%", "consecutive_promotion_rate": "20.7%"}, {"date": "2026-01-08", "sentiment_index": 87, "limit_up": 92, "limit_down": 3, "major_pullback": 3, "volume": 28003.0, "consecutive_height": 10, "up_count": 3532, "down_count": 1514, "seal_rate": "76.0%", "limit_up_performance": "3.92%", "consecutive_performance": "7.50%", "consecutive_promotion_rate": "32.5%"}, {"date": "2026-01-07", "sentiment_index": 80, "limit_up": 80, "limit_down": 3, "major_pullback": 11, "volume": 28541.0, "consecutive_height": 14, "up_count": 2077, "down_count": 3003, "seal_rate": "64.5%", "limit_up_performance": "1.42%", "consecutive_performance": "2.42%", "consecutive_promotion_rate": "19.2%"}, {"date": "2026-01-06", "sentiment_index": 100, "limit_up": 120, "limit_down": 1, "major_pullback": 4, "volume": 28065.0, "consecutive_height": 13, "up_count": 3843, "down_count": 1201, "seal_rate": "82.4%", "limit_up_performance": "5.97%", "consecutive_performance": "6.39%", "consecutive_promotion_rate": "39.8%"}, {"date": "2026-01-05", "sentiment_index": 81, "limit_up": 108, "limit_down": 8, "major_pullback": 2, "volume": 25463.0, "consecutive_height": 7, "up_count": 3958, "down_count": 1111, "seal_rate": "80.5%", "limit_up_performance": "2.30%", "consecutive_performance": "-0.39%", "consecutive_promotion_rate": "24.6%"}];
-        const dailyReports = [{"date": "2026-02-24", "phase": "情绪修复期/新周期启动初期", "action": "关注低位首板/二板新题材、科技成长方向；回避节前高位连板股、缩量加速板。", "summary": "节后首日情绪修复到位，明日分化预期，控仓参与低位新方向，回避高位接力。", "mowen_link": "https://note.mowen.cn/detail/VRYzIpA6fy1ZIEFHU2hW1"}];
-        const klineData = [{"date": "2026-02-13", "open": 6267.77, "close": 6227.54, "high": 6297.89, "low": 6223.87, "volume": 1117860733.0, "ma5": 6272.51, "ma10": 6225.12, "ma50": 6071.88}, {"date": "2026-02-12", "open": 6281.02, "close": 6299.9, "high": 6309.49, "low": 6267.16, "volume": 1201609826.0, "ma5": 6259.33, "ma10": 6228.28, "ma50": 6061.54}, {"date": "2026-02-11", "open": 6273.74, "close": 6272.72, "high": 6298.35, "low": 6272.21, "volume": 1154950566.0, "ma5": 6234.57, "ma10": 6230.27, "ma50": 6050.55}, {"date": "2026-02-10", "open": 6282.4, "close": 6283.26, "high": 6296.57, "low": 6259.53, "volume": 1231659007.0, "ma5": 6229.12, "ma10": 6236.14, "ma50": 6040.84}, {"date": "2026-02-09", "open": 6241.44, "close": 6279.14, "high": 6279.76, "low": 6225.5, "volume": 1278459467.0, "ma5": 6215.89, "ma10": 6240.2, "ma50": 6029.83}, {"date": "2026-02-06", "open": 6115.08, "close": 6161.61, "high": 6218.09, "low": 6092.7, "volume": 1263385587.0, "ma5": 6177.72, "ma10": 6243.76, "ma50": 6018.05}, {"date": "2026-02-05", "open": 6190.56, "close": 6176.13, "high": 6214.73, "low": 6143.44, "volume": 1297917525.0, "ma5": 6197.23, "ma10": 6263.28, "ma50": 6008.62}, {"date": "2026-02-04", "open": 6202.45, "close": 6245.44, "high": 6250.08, "low": 6174.08, "volume": 1465472640.0, "ma5": 6225.96, "ma10": 6275.48, "ma50": 5998.62}, {"date": "2026-02-03", "open": 6149.25, "close": 6217.13, "high": 6218.25, "low": 6093.59, "volume": 1395121896.0, "ma5": 6243.17, "ma10": 6277.96, "ma50": 5985.89}, {"date": "2026-02-02", "open": 6205.84, "close": 6088.28, "high": 6244.23, "low": 6086.53, "volume": 1516257931.0, "ma5": 6264.5, "ma10": 6279.8, "ma50": 5973.06}, {"date": "2026-01-30", "open": 6272.92, "close": 6259.18, "high": 6302.48, "low": 6153.36, "volume": 1678482287.0, "ma5": 6309.81, "ma10": 6298.22, "ma50": 5966.41}, {"date": "2026-01-29", "open": 6330.6, "close": 6319.77, "high": 6352.77, "low": 6300.78, "volume": 1872711355.0, "ma5": 6329.34, "ma10": 6296.99, "ma50": 5957.09}, {"date": "2026-01-28", "open": 6338.22, "close": 6331.49, "high": 6355.98, "low": 6301.94, "volume": 1678589693.0, "ma5": 6324.99, "ma10": 6291.0, "ma50": 5946.88}, {"date": "2026-01-27", "open": 6297.0, "close": 6323.78, "high": 6348.01, "low": 6227.9, "volume": 1637572622.0, "ma5": 6312.75, "ma10": 6284.89, "ma50": 5937.54}, {"date": "2026-01-26", "open": 6377.55, "close": 6314.82, "high": 6391.28, "low": 6294.68, "volume": 1882125577.0, "ma5": 6295.11, "ma10": 6277.66, "ma50": 5928.5}, {"date": "2026-01-23", "open": 6312.49, "close": 6356.82, "high": 6361.96, "low": 6308.82, "volume": 1739700671.0, "ma5": 6286.63, "ma10": 6278.74, "ma50": 5921.17}, {"date": "2026-01-22", "open": 6289.69, "close": 6298.06, "high": 6308.24, "low": 6266.42, "volume": 1509534339.0, "ma5": 6264.65, "ma10": 6264.82, "ma50": 5911.46}, {"date": "2026-01-21", "open": 6212.96, "close": 6270.26, "high": 6293.74, "low": 6212.96, "volume": 1437210715.0, "ma5": 6257.0, "ma10": 6249.57, "ma50": 5903.42}, {"date": "2026-01-20", "open": 6277.54, "close": 6235.57, "high": 6292.45, "low": 6185.38, "volume": 1590754385.0, "ma5": 6257.03, "ma10": 6236.8, "ma50": 5896.54}, {"date": "2026-01-19", "open": 6227.3, "close": 6272.45, "high": 6292.94, "low": 6227.07, "volume": 1495743468.0, "ma5": 6260.21, "ma10": 6226.42, "ma50": 5889.9}, {"date": "2026-01-16", "open": 6285.05, "close": 6246.92, "high": 6306.03, "low": 6235.71, "volume": 1644756269.0, "ma5": 6270.85, "ma10": 6202.77, "ma50": 5882.83}, {"date": "2026-01-15", "open": 6231.5, "close": 6259.82, "high": 6284.05, "low": 6214.07, "volume": 1627702323.0, "ma5": 6265.0, "ma10": 6169.99, "ma50": 5874.85}, {"date": "2026-01-14", "open": 6255.98, "close": 6270.41, "high": 6371.55, "low": 6213.18, "volume": 2237951313.0, "ma5": 6242.14, "ma10": 6136.9, "ma50": 5866.21}, {"date": "2026-01-13", "open": 6339.16, "close": 6251.44, "high": 6339.23, "low": 6231.2, "volume": 2039220065.0, "ma5": 6216.57, "ma10": 6101.97, "ma50": 5858.58}, {"date": "2026-01-12", "open": 6252.44, "close": 6325.64, "high": 6333.03, "low": 6227.18, "volume": 1962291309.0, "ma5": 6192.62, "ma10": 6070.66, "ma50": 5850.88}, {"date": "2026-01-09", "open": 6140.35, "close": 6217.68, "high": 6220.46, "low": 6140.35, "volume": 1716232795.0, "ma5": 6134.69, "ma10": 6029.95, "ma50": 5842.35}, {"date": "2026-01-08", "open": 6124.98, "close": 6145.54, "high": 6164.19, "low": 6115.15, "volume": 1561497972.0, "ma5": 6074.98, "ma10": 5996.55, "ma50": 5837.22}, {"date": "2026-01-07", "open": 6140.61, "close": 6142.57, "high": 6167.26, "low": 6111.37, "volume": 1573310954.0, "ma5": 6031.66, "ma10": 5965.14, "ma50": 5832.17}, {"date": "2026-01-06", "open": 6040.17, "close": 6131.69, "high": 6131.69, "low": 6039.95, "volume": 1611208940.0, "ma5": 5987.37, "ma10": 5934.44, "ma50": 5827.58}, {"date": "2026-01-05", "open": 5955.76, "close": 6035.98, "high": 6035.98, "low": 5955.76, "volume": 1403929953.0, "ma5": 5948.69, "ma10": 5899.02, "ma50": 5821.8}];
-        
-        let currentDateIndex = 0;
-        
+        // 短线情绪数据
+        const marketData = [{"date":"2026-02-24","sentiment_index":63,"limit_up":92,"limit_down":15,"major_pullback":2,"volume":22021.0,"consecutive_height":4,"up_count":3764,"down_count":1344,"seal_rate":"69.2%","limit_up_performance":"1.89%","consecutive_performance":"2.01%","consecutive_promotion_rate":"21.9%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-13","sentiment_index":35,"limit_up":32,"limit_down":12,"major_pullback":6,"volume":19827.0,"consecutive_height":5,"up_count":1430,"down_count":3653,"seal_rate":"74.4%","limit_up_performance":"-1.04%","consecutive_performance":"-0.90%","consecutive_promotion_rate":"8.3%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-12","sentiment_index":53,"limit_up":60,"limit_down":13,"major_pullback":2,"volume":21417.0,"consecutive_height":4,"up_count":1995,"down_count":3109,"seal_rate":"75.9%","limit_up_performance":"2.46%","consecutive_performance":"1.62%","consecutive_promotion_rate":"33.3%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-11","sentiment_index":45,"limit_up":51,"limit_down":5,"major_pullback":9,"volume":19843.0,"consecutive_height":4,"up_count":1977,"down_count":3030,"seal_rate":"75.0%","limit_up_performance":"0.12%","consecutive_performance":"3.25%","consecutive_promotion_rate":"18.3%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-10","sentiment_index":54,"limit_up":60,"limit_down":2,"major_pullback":4,"volume":21055.0,"consecutive_height":3,"up_count":2151,"down_count":2884,"seal_rate":"88.2%","limit_up_performance":"2.86%","consecutive_performance":"-0.11%","consecutive_promotion_rate":"25.3%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-09","sentiment_index":74,"limit_up":83,"limit_down":3,"major_pullback":1,"volume":22495.0,"consecutive_height":5,"up_count":4372,"down_count":717,"seal_rate":"76.9%","limit_up_performance":"3.45%","consecutive_performance":"4.97%","consecutive_promotion_rate":"25.5%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-06","sentiment_index":48,"limit_up":55,"limit_down":5,"major_pullback":6,"volume":21457.0,"consecutive_height":4,"up_count":2574,"down_count":2444,"seal_rate":"67.9%","limit_up_performance":"0.31%","consecutive_performance":"4.48%","consecutive_promotion_rate":"18.2%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-05","sentiment_index":40,"limit_up":44,"limit_down":15,"major_pullback":4,"volume":21762.0,"consecutive_height":4,"up_count":1588,"down_count":3462,"seal_rate":"81.5%","limit_up_performance":"0.83%","consecutive_performance":"2.40%","consecutive_promotion_rate":"14.7%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-04","sentiment_index":58,"limit_up":68,"limit_down":5,"major_pullback":6,"volume":24810.0,"consecutive_height":4,"up_count":3141,"down_count":1960,"seal_rate":"78.2%","limit_up_performance":"3.41%","consecutive_performance":"3.11%","consecutive_promotion_rate":"18.8%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-03","sentiment_index":70,"limit_up":69,"limit_down":9,"major_pullback":0,"volume":25442.0,"consecutive_height":4,"up_count":4583,"down_count":514,"seal_rate":"79.3%","limit_up_performance":"4.35%","consecutive_performance":"5.78%","consecutive_promotion_rate":"27.8%","ma50_percent":null,"strong_percent":null},{"date":"2026-02-02","sentiment_index":31,"limit_up":36,"limit_down":98,"major_pullback":3,"volume":25848.0,"consecutive_height":3,"up_count":738,"down_count":4395,"seal_rate":"66.7%","limit_up_performance":"0.56%","consecutive_performance":"3.91%","consecutive_promotion_rate":"20.8%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-30","sentiment_index":47,"limit_up":48,"limit_down":52,"major_pullback":12,"volume":28355.0,"consecutive_height":5,"up_count":2360,"down_count":2703,"seal_rate":"69.6%","limit_up_performance":"-0.97%","consecutive_performance":"-1.50%","consecutive_promotion_rate":"8.5%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-29","sentiment_index":62,"limit_up":82,"limit_down":12,"major_pullback":9,"volume":32300.0,"consecutive_height":8,"up_count":1718,"down_count":3363,"seal_rate":"70.7%","limit_up_performance":"3.07%","consecutive_performance":"4.87%","consecutive_promotion_rate":"16.2%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-28","sentiment_index":53,"limit_up":80,"limit_down":5,"major_pullback":7,"volume":29654.0,"consecutive_height":7,"up_count":1631,"down_count":3460,"seal_rate":"75.5%","limit_up_performance":"2.09%","consecutive_performance":"5.12%","consecutive_promotion_rate":"18.9%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-27","sentiment_index":52,"limit_up":53,"limit_down":2,"major_pullback":2,"volume":28950.0,"consecutive_height":6,"up_count":1856,"down_count":3237,"seal_rate":"74.6%","limit_up_performance":"2.62%","consecutive_performance":"4.59%","consecutive_promotion_rate":"20.0%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-26","sentiment_index":52,"limit_up":70,"limit_down":30,"major_pullback":18,"volume":32482.0,"consecutive_height":5,"up_count":1538,"down_count":3547,"seal_rate":"64.2%","limit_up_performance":"0.23%","consecutive_performance":"0.40%","consecutive_promotion_rate":"14.4%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-23","sentiment_index":96,"limit_up":104,"limit_down":0,"major_pullback":2,"volume":30852.0,"consecutive_height":18,"up_count":3707,"down_count":1336,"seal_rate":"85.0%","limit_up_performance":"2.34%","consecutive_performance":"1.38%","consecutive_promotion_rate":"17.8%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-22","sentiment_index":86,"limit_up":73,"limit_down":2,"major_pullback":3,"volume":26917.0,"consecutive_height":17,"up_count":3373,"down_count":1696,"seal_rate":"73.5%","limit_up_performance":"3.19%","consecutive_performance":"4.46%","consecutive_promotion_rate":"21.5%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-21","sentiment_index":77,"limit_up":79,"limit_down":4,"major_pullback":1,"volume":26006.0,"consecutive_height":16,"up_count":2962,"down_count":2045,"seal_rate":"75.7%","limit_up_performance":"2.15%","consecutive_performance":"3.20%","consecutive_promotion_rate":"14.8%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-20","sentiment_index":67,"limit_up":54,"limit_down":16,"major_pullback":5,"volume":27777.0,"consecutive_height":15,"up_count":2139,"down_count":2918,"seal_rate":"77.9%","limit_up_performance":"2.50%","consecutive_performance":"3.80%","consecutive_promotion_rate":"14.8%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-19","sentiment_index":80,"limit_up":88,"limit_down":23,"major_pullback":6,"volume":27083.0,"consecutive_height":14,"up_count":3408,"down_count":1664,"seal_rate":"81.3%","limit_up_performance":"2.72%","consecutive_performance":"2.17%","consecutive_promotion_rate":"19.0%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-16","sentiment_index":49,"limit_up":58,"limit_down":46,"major_pullback":13,"volume":30262.0,"consecutive_height":5,"up_count":2251,"down_count":2807,"seal_rate":"59.8%","limit_up_performance":"-0.32%","consecutive_performance":"-3.04%","consecutive_promotion_rate":"10.9%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-15","sentiment_index":52,"limit_up":55,"limit_down":63,"major_pullback":22,"volume":29055.0,"consecutive_height":4,"up_count":2168,"down_count":2898,"seal_rate":"75.3%","limit_up_performance":"-2.33%","consecutive_performance":"-1.23%","consecutive_promotion_rate":"15.7%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-14","sentiment_index":70,"limit_up":102,"limit_down":14,"major_pullback":10,"volume":39414.0,"consecutive_height":5,"up_count":2562,"down_count":2493,"seal_rate":"62.7%","limit_up_performance":"3.96%","consecutive_performance":"5.81%","consecutive_promotion_rate":"30.3%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-13","sentiment_index":76,"limit_up":66,"limit_down":49,"major_pullback":76,"volume":36510.0,"consecutive_height":13,"up_count":1519,"down_count":3547,"seal_rate":"52.4%","limit_up_performance":"1.01%","consecutive_performance":"2.70%","consecutive_promotion_rate":"15.8%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-12","sentiment_index":100,"limit_up":183,"limit_down":3,"major_pullback":4,"volume":36014.0,"consecutive_height":12,"up_count":3871,"down_count":1167,"seal_rate":"79.1%","limit_up_performance":"6.40%","consecutive_performance":"8.60%","consecutive_promotion_rate":"46.8%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-09","sentiment_index":88,"limit_up":94,"limit_down":1,"major_pullback":9,"volume":31227.0,"consecutive_height":11,"up_count":3718,"down_count":1271,"seal_rate":"66.7%","limit_up_performance":"3.05%","consecutive_performance":"5.13%","consecutive_promotion_rate":"20.7%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-08","sentiment_index":87,"limit_up":92,"limit_down":3,"major_pullback":3,"volume":28003.0,"consecutive_height":10,"up_count":3532,"down_count":1514,"seal_rate":"76.0%","limit_up_performance":"3.92%","consecutive_performance":"7.50%","consecutive_promotion_rate":"32.5%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-07","sentiment_index":80,"limit_up":80,"limit_down":3,"major_pullback":11,"volume":28541.0,"consecutive_height":14,"up_count":2077,"down_count":3003,"seal_rate":"64.5%","limit_up_performance":"1.42%","consecutive_performance":"2.42%","consecutive_promotion_rate":"19.2%","ma50_percent":null,"strong_percent":null},{"date":"2026-01-06","sentiment_index":100,"limit_up":120,"limit_down":1,"major_pullback":4,"volume":28065.0,"consecutive_height":13,"up_count":3843,"down_count":1201,"seal_rate":"82.4%","limit_up_performance":"5.97%","consecutive_performance":"6.39%","consecutive_promotion_rate":"39.8%","ma50_percent":null,"strong_percent":null}];
+
+        // K线数据
+        const klineData = {"000001":{"name":"上证指数","display":"上证","data":[{"date":"2025-11-21","open":3896.665,"close":3834.891,"high":3912.006,"low":3834.749,"volume":63164625100.0,"ma5":3834.891,"ma10":3834.891,"ma50":3834.891},{"date":"2025-11-24","open":3848.657,"close":3836.766,"high":3854.331,"low":3816.576,"volume":50460171600.0,"ma5":3835.8285,"ma10":3835.8285,"ma50":3835.8285},{"date":"2025-11-25","open":3850.571,"close":3870.023,"high":3882.03,"low":3845.138,"volume":47872761100.0,"ma5":3847.226666666667,"ma10":3847.226666666667,"ma50":3847.226666666667},{"date":"2025-11-26","open":3867.429,"close":3864.184,"high":3879.923,"low":3861.177,"volume":45758975500.0,"ma5":3851.4660000000003,"ma10":3851.4660000000003,"ma50":3851.4660000000003},{"date":"2025-11-27","open":3867.197,"close":3875.259,"high":3895.589,"low":3864.131,"volume":44402194700.0,"ma5":3856.2246,"ma10":3856.2246,"ma50":3856.2246},{"date":"2025-11-28","open":3870.944,"close":3888.596,"high":3888.889,"low":3856.25,"volume":44993197300.0,"ma5":3866.9656000000004,"ma10":3861.6198333333336,"ma50":3861.6198333333336},{"date":"2025-12-01","open":3894.213,"close":3914.006,"high":3914.464,"low":3890.949,"volume":53755413300.0,"ma5":3882.4136,"ma10":3869.1035714285717,"ma50":3869.1035714285717},{"date":"2025-12-02","open":3908.456,"close":3897.712,"high":3908.769,"low":3888.328,"volume":45558449400.0,"ma5":3887.9514000000004,"ma10":3872.679625,"ma50":3872.679625},{"date":"2025-12-03","open":3894.156,"close":3878.0,"high":3901.696,"low":3869.953,"volume":48561727000.0,"ma5":3890.7145999999993,"ma10":3873.270777777778,"ma50":3873.270777777778},{"date":"2025-12-04","open":3879.742,"close":3875.793,"high":3888.86,"low":3859.049,"volume":44504029000.0,"ma5":3890.8214,"ma10":3873.523,"ma50":3873.523},{"date":"2025-12-05","open":3873.121,"close":3902.808,"high":3907.782,"low":3863.314,"volume":50036876800.0,"ma5":3893.6638,"ma10":3880.3147,"ma50":3876.1852727272726},{"date":"2025-12-08","open":3909.226,"close":3924.078,"high":3936.311,"low":3904.738,"volume":54734978900.0,"ma5":3895.6782,"ma10":3889.0458999999996,"ma50":3880.1763333333333},{"date":"2025-12-09","open":3916.509,"close":3909.522,"high":3923.899,"low":3902.128,"volume":52453825600.0,"ma5":3898.0401999999995,"ma10":3892.9957999999997,"ma50":3882.433692307692},{"date":"2025-12-10","open":3901.128,"close":3900.496,"high":3906.116,"low":3876.475,"volume":49733150400.0,"ma5":3902.5394,"ma10":3896.6269999999995,"ma50":3883.723857142857},{"date":"2025-12-11","open":3903.895,"close":3873.318,"high":3904.963,"low":3862.821,"volume":52565860000.0,"ma5":3902.0443999999998,"ma10":3896.4329,"ma50":3883.030133333333},{"date":"2025-12-12","open":3869.413,"close":3889.346,"high":3891.807,"low":3850.597,"volume":57394713000.0,"ma5":3899.3520000000003,"ma10":3896.5078999999996,"ma50":3883.424875},{"date":"2025-12-15","open":3865.402,"close":3867.921,"high":3896.977,"low":3863.63,"volume":50092279000.0,"ma5":3888.1205999999997,"ma10":3891.8994,"ma50":3882.5128823529412},{"date":"2025-12-16","open":3861.515,"close":3824.812,"high":3862.427,"low":3815.844,"volume":51249482700.0,"ma5":3871.1786,"ma10":3884.6094,"ma50":3879.307277777778},{"date":"2025-12-17","open":3822.509,"close":3870.278,"high":3881.752,"low":3817.996,"volume":51231369200.0,"ma5":3865.1349999999998,"ma10":3883.8371999999995,"ma50":3878.8320526315792},{"date":"2025-12-18","open":3857.257,"close":3876.371,"high":3888.285,"low":3856.423,"volume":46117262500.0,"ma5":3865.7455999999997,"ma10":3883.8949999999995,"ma50":3878.7090000000003},{"date":"2025-12-19","open":3878.227,"close":3890.448,"high":3902.671,"low":3871.777,"volume":51351189300.0,"ma5":3865.9660000000003,"ma10":3882.6589999999997,"ma50":3879.2680000000005},{"date":"2025-12-22","open":3900.535,"close":3917.364,"high":3920.012,"low":3900.515,"volume":52293899200.0,"ma5":3875.8546,"ma10":3881.9875999999995,"ma50":3880.999636363637},{"date":"2025-12-23","open":3919.106,"close":3919.979,"high":3937.127,"low":3910.745,"volume":52115695200.0,"ma5":3894.888,"ma10":3883.0333,"ma50":3882.6943913043488},{"date":"2025-12-24","open":3920.347,"close":3940.947,"high":3947.041,"low":3912.311,"volume":47489644700.0,"ma5":3909.0217999999995,"ma10":3887.0784,"ma50":3885.1215833333335},{"date":"2025-12-25","open":3937.72,"close":3959.621,"high":3964.073,"low":3936.078,"volume":46931309300.0,"ma5":3925.6718,"ma10":3895.7087,"ma50":3888.10156},{"date":"2025-12-26","open":3957.833,"close":3963.679,"high":3977.706,"low":3945.524,"volume":55548959200.0,"ma5":3940.318,"ma10":3903.142,"ma50":3891.008384615385},{"date":"2025-12-29","open":3964.651,"close":3965.28,"high":3983.979,"low":3956.946,"volume":56368719700.0,"ma5":3949.9011999999993,"ma10":3912.8778999999995,"ma50":3893.7591851851853},{"date":"2025-12-30","open":3947.871,"close":3965.116,"high":3979.99,"low":3947.419,"volume":52593258800.0,"ma5":3958.9286,"ma10":3926.9083,"ma50":3896.307642857143},{"date":"2025-12-31","open":3968.726,"close":3968.84,"high":3977.536,"low":3955.487,"volume":49075149000.0,"ma5":3964.5072,"ma10":3936.7645,"ma50":3898.80875862069},{"date":"2026-01-05","open":3986.972,"close":4023.417,"high":4025.263,"low":3983.576,"volume":59695045500.0,"ma5":3977.2664000000004,"ma10":3951.4691000000007,"ma50":3902.9623666666666},{"date":"2026-01-06","open":4026.016,"close":4083.667,"high":4083.667,"low":4025.088,"volume":70247227000.0,"ma5":4001.264,"ma10":3970.791,"ma50":3908.791548387097},{"date":"2026-01-07","open":4083.843,"close":4085.772,"high":4098.777,"low":4069.436,"volume":68338435200.0,"ma5":4025.3623999999995,"ma10":3987.6318,"ma50":3914.3221875},{"date":"2026-01-08","open":4077.715,"close":4082.979,"high":4093.872,"low":4067.122,"volume":66613133700.0,"ma5":4048.935,"ma10":4003.9318,"ma50":3919.433},{"date":"2026-01-09","open":4086.762,"close":4120.426,"high":4121.723,"low":4083.616,"volume":72983798500.0,"ma5":4079.2522,"ma10":4021.8797,"ma50":3925.3445588235295},{"date":"2026-01-12","open":4134.893,"close":4165.287,"high":4168.357,"low":4119.879,"volume":83945608900.0,"ma5":4107.626200000001,"ma10":4042.4463000000005,"ma50":3932.2000571428575},{"date":"2026-01-13","open":4169.704,"close":4138.759,"high":4179.702,"low":4126.234,"volume":86838271700.0,"ma5":4118.6446,"ma10":4059.9543,"ma50":3937.9378055555553},{"date":"2026-01-14","open":4138.645,"close":4126.093,"high":4190.866,"low":4103.621,"volume":95255128900.0,"ma5":4126.7088,"ma10":4076.0356,"ma50":3943.023081081081},{"date":"2026-01-15","open":4106.224,"close":4112.601,"high":4133.073,"low":4096.85,"volume":68025079100.0,"ma5":4132.633199999999,"ma10":4090.7841,"ma50":3947.4856578947365},{"date":"2026-01-16","open":4127.063,"close":4101.913,"high":4140.225,"low":4091.811,"volume":76358846500.0,"ma5":4128.9306,"ma10":4104.091399999999,"ma50":3951.445333333333},{"date":"2026-01-19","open":4090.719,"close":4114.0,"high":4126.518,"low":4090.057,"volume":68890587000.0,"ma5":4118.673199999999,"ma10":4113.1497,"ma50":3955.5092000000004},{"date":"2026-01-20","open":4116.366,"close":4113.649,"high":4128.93,"low":4080.294,"volume":73436249600.0,"ma5":4113.6512,"ma10":4116.1479,"ma50":3959.3662682926833},{"date":"2026-01-21","open":4103.529,"close":4116.94,"high":4135.959,"low":4103.529,"volume":66698950700.0,"ma5":4111.8206,"ma10":4119.264700000001,"ma50":3963.1180238095244},{"date":"2026-01-22","open":4126.072,"close":4122.576,"high":4140.838,"low":4109.923,"volume":70969540900.0,"ma5":4113.8156,"ma10":4123.224400000001,"ma50":3966.82634883721},{"date":"2026-01-23","open":4130.108,"close":4136.164,"high":4143.75,"low":4120.204,"volume":78211545400.0,"ma5":4120.665800000001,"ma10":4124.798199999999,"ma50":3970.6749318181824},{"date":"2026-01-26","open":4144.778,"close":4132.605,"high":4160.985,"low":4124.7,"volume":88743973100.0,"ma5":4124.3868,"ma10":4121.530000000001,"ma50":3974.2733777777785},{"date":"2026-01-27","open":4125.216,"close":4139.904,"high":4158.802,"low":4101.83,"volume":75499086900.0,"ma5":4129.6377999999995,"ma10":4121.6445,"ma50":3977.8740434782617},{"date":"2026-01-28","open":4150.215,"close":4151.238,"high":4170.147,"low":4138.019,"volume":82302674800.0,"ma5":4136.4974,"ma10":4124.159000000001,"ma50":3981.5626382978735},{"date":"2026-01-29","open":4155.919,"close":4157.985,"high":4170.214,"low":4138.299,"volume":90590837100.0,"ma5":4143.5792,"ma10":4128.6974,"ma50":3985.2381041666667},{"date":"2026-01-30","open":4131.993,"close":4117.948,"high":4152.85,"low":4064.777,"volume":80434274600.0,"ma5":4139.936,"ma10":4130.3009,"ma50":3987.9464693877553},{"date":"2026-02-02","open":4079.708,"close":4015.746,"high":4103.407,"low":4013.656,"volume":73295369800.0,"ma5":4116.5642,"ma10":4120.4755000000005,"ma50":3988.5024600000006},{"date":"2026-02-03","open":4043.906,"close":4067.738,"high":4069.418,"low":4002.782,"volume":63768424900.0,"ma5":4102.131,"ma10":4115.8844,"ma50":3993.1594},{"date":"2026-02-04","open":4064.677,"close":4102.202,"high":4104.621,"low":4062.683,"volume":67425424400.0,"ma5":4092.3237999999997,"ma10":4114.410599999999,"ma50":3998.4681199999995},{"date":"2026-02-05","open":4075.025,"close":4075.917,"high":4088.904,"low":4048.939,"volume":59672223600.0,"ma5":4075.9102000000007,"ma10":4109.7447,"ma50":4002.5859999999993},{"date":"2026-02-06","open":4040.299,"close":4065.583,"high":4095.03,"low":4029.973,"volume":55670980100.0,"ma5":4065.4372000000003,"ma10":4102.6866,"ma50":4006.61398},{"date":"2026-02-09","open":4103.54,"close":4123.09,"high":4123.159,"low":4093.056,"volume":57263258200.0,"ma5":4086.906,"ma10":4101.7351,"ma50":4011.5706000000005},{"date":"2026-02-10","open":4127.766,"close":4128.373,"high":4134.338,"low":4117.564,"volume":52462096900.0,"ma5":4099.033,"ma10":4100.582,"ma50":4016.3661399999996},{"date":"2026-02-11","open":4124.428,"close":4131.985,"high":4142.561,"low":4122.428,"volume":50068527800.0,"ma5":4104.9896,"ma10":4098.6567000000005,"ma50":4020.72572},{"date":"2026-02-12","open":4136.99,"close":4134.018,"high":4140.593,"low":4124.131,"volume":52937011600.0,"ma5":4116.6098,"ma10":4096.26,"ma50":4025.4518399999997},{"date":"2026-02-13","open":4115.924,"close":4082.073,"high":4123.844,"low":4079.77,"volume":50079947200.0,"ma5":4119.9078,"ma10":4092.6724999999997,"ma50":4029.5333},{"date":"2026-02-24","open":4129.134,"close":4117.409,"high":4131.55,"low":4105.937,"volume":56632224900.0,"ma5":4118.7716,"ma10":4102.8387999999995,"ma50":4034.3656200000005}]},"399006":{"name":"创业板指","display":"创业板","data":[{"date":"2025-11-21","open":2979.371,"close":2920.078,"high":2996.794,"low":2920.039,"volume":24648637338.0,"ma5":2920.078,"ma10":2920.078,"ma50":2920.078},{"date":"2025-11-24","open":2946.456,"close":2929.043,"high":2951.434,"low":2892.274,"volume":21908590872.0,"ma5":2924.5605,"ma10":2924.5605,"ma50":2924.5605},{"date":"2025-11-25","open":2970.731,"close":2980.934,"high":3027.83,"low":2961.932,"volume":22808738026.0,"ma5":2943.351666666667,"ma10":2943.351666666667,"ma50":2943.351666666667},{"date":"2025-11-26","open":2976.705,"close":3044.695,"high":3081.491,"low":2962.992,"volume":21283321280.0,"ma5":2968.6875,"ma10":2968.6875,"ma50":2968.6875},{"date":"2025-11-27","open":3041.205,"close":3031.296,"high":3113.442,"low":3027.305,"volume":19514288579.0,"ma5":2981.2092000000002,"ma10":2981.2092000000002,"ma50":2981.2092000000002},{"date":"2025-11-28","open":3029.977,"close":3052.587,"high":3067.76,"low":3013.494,"volume":18738179122.0,"ma5":3007.7110000000002,"ma10":2993.1055,"ma50":2993.1055},{"date":"2025-12-01","open":3060.557,"close":3092.499,"high":3093.962,"low":3037.688,"volume":21008205794.0,"ma5":3040.4022,"ma10":3007.3045714285718,"ma50":3007.3045714285718},{"date":"2025-12-02","open":3091.369,"close":3071.149,"high":3094.177,"low":3056.362,"volume":19246524050.0,"ma5":3058.4451999999997,"ma10":3015.285125,"ma50":3015.285125},{"date":"2025-12-03","open":3078.858,"close":3036.786,"high":3105.304,"low":3028.696,"volume":19585191000.0,"ma5":3056.8633999999997,"ma10":3017.674111111111,"ma50":3017.674111111111},{"date":"2025-12-04","open":3037.051,"close":3067.484,"high":3075.458,"low":3016.579,"volume":17561563591.0,"ma5":3064.1009999999997,"ma10":3022.6551,"ma50":3022.6551},{"date":"2025-12-05","open":3084.217,"close":3109.297,"high":3115.814,"low":3048.943,"volume":18848488749.0,"ma5":3075.443,"ma10":3041.577,"ma50":3030.531636363636},{"date":"2025-12-08","open":3119.151,"close":3190.269,"high":3214.478,"low":3119.151,"volume":21190777492.0,"ma5":3094.9970000000003,"ma10":3067.6996,"ma50":3043.843083333333},{"date":"2025-12-09","open":3183.613,"close":3209.603,"high":3235.536,"low":3175.506,"volume":19411787047.0,"ma5":3122.6878000000006,"ma10":3090.5665,"ma50":3056.5938461538462},{"date":"2025-12-10","open":3201.378,"close":3209.004,"high":3220.235,"low":3143.415,"volume":18550766603.0,"ma5":3157.1313999999998,"ma10":3106.9973999999997,"ma50":3067.480285714286},{"date":"2025-12-11","open":3210.546,"close":3163.675,"high":3246.317,"low":3163.675,"volume":19403941107.0,"ma5":3176.3695999999995,"ma10":3120.2353,"ma50":3073.893266666667},{"date":"2025-12-12","open":3172.731,"close":3194.359,"high":3203.254,"low":3137.625,"volume":20278545302.0,"ma5":3193.382,"ma10":3134.4125,"ma50":3081.422375},{"date":"2025-12-15","open":3157.32,"close":3137.801,"high":3184.625,"low":3135.663,"volume":18067347997.0,"ma5":3182.8884,"ma10":3138.9427,"ma50":3084.738764705882},{"date":"2025-12-16","open":3130.428,"close":3071.762,"high":3141.579,"low":3058.792,"volume":18155089402.0,"ma5":3155.3202,"ma10":3139.004,"ma50":3084.0178333333333},{"date":"2025-12-17","open":3072.621,"close":3175.908,"high":3181.689,"low":3072.621,"volume":18686832441.0,"ma5":3148.701,"ma10":3152.9161999999997,"ma50":3088.854157894737},{"date":"2025-12-18","open":3138.657,"close":3107.065,"high":3154.066,"low":3107.065,"volume":16921874026.0,"ma5":3137.379,"ma10":3156.8742999999995,"ma50":3089.7647000000006},{"date":"2025-12-19","open":3134.804,"close":3122.238,"high":3157.29,"low":3112.032,"volume":17736191710.0,"ma5":3122.9548,"ma10":3158.1684,"ma50":3091.3110476190477},{"date":"2025-12-22","open":3153.749,"close":3191.985,"high":3197.941,"low":3153.749,"volume":17522753517.0,"ma5":3133.7916,"ma10":3158.34,"ma50":3095.8871363636367},{"date":"2025-12-23","open":3196.309,"close":3205.011,"high":3227.067,"low":3184.534,"volume":18388058045.0,"ma5":3160.4414,"ma10":3157.8808,"ma50":3100.631652173913},{"date":"2025-12-24","open":3207.409,"close":3229.577,"high":3234.999,"low":3193.967,"volume":18267504994.0,"ma5":3171.1752,"ma10":3159.9381,"ma50":3106.004374999999},{"date":"2025-12-25","open":3232.971,"close":3239.343,"high":3249.105,"low":3200.492,"volume":19356999681.0,"ma5":3197.6308000000004,"ma10":3167.5049000000004,"ma50":3111.337919999999},{"date":"2025-12-26","open":3232.409,"close":3243.876,"high":3268.695,"low":3219.131,"volume":21093462998.0,"ma5":3221.9584000000004,"ma10":3172.4566000000004,"ma50":3116.435538461538},{"date":"2025-12-29","open":3237.773,"close":3222.611,"high":3250.088,"low":3208.076,"volume":19624276753.0,"ma5":3228.0836000000004,"ma10":3180.9376,"ma50":3120.3679629629623},{"date":"2025-12-30","open":3208.323,"close":3242.905,"high":3251.133,"low":3207.729,"volume":20695328504.0,"ma5":3235.6624,"ma10":3198.0519,"ma50":3124.744285714285},{"date":"2025-12-31","open":3247.737,"close":3203.172,"high":3254.89,"low":3198.248,"volume":20619816729.0,"ma5":3230.3814,"ma10":3200.7782999999995,"ma50":3127.448689655172},{"date":"2026-01-05","open":3229.933,"close":3294.551,"high":3295.286,"low":3229.933,"volume":26314261047.0,"ma5":3241.423,"ma10":3219.5269,"ma50":3133.0187666666666},{"date":"2026-01-06","open":3279.811,"close":3319.292,"high":3321.436,"low":3265.729,"volume":27815065515.0,"ma5":3256.5062,"ma10":3239.2323000000006,"ma50":3139.0275806451614},{"date":"2026-01-07","open":3331.341,"close":3329.693,"high":3351.216,"low":3298.553,"volume":27164105082.0,"ma5":3277.9226000000003,"ma10":3253.0031000000004,"ma50":3144.9858750000003},{"date":"2026-01-08","open":3308.738,"close":3302.307,"high":3328.955,"low":3285.164,"volume":28086491869.0,"ma5":3289.803,"ma10":3262.7326999999996,"ma50":3149.753181818182},{"date":"2026-01-09","open":3279.376,"close":3327.813,"high":3330.012,"low":3269.993,"volume":33328063500.0,"ma5":3314.7312000000006,"ma10":3272.5563,"ma50":3154.9902352941176},{"date":"2026-01-12","open":3323.636,"close":3388.341,"high":3398.05,"low":3282.389,"volume":40685183170.0,"ma5":3333.4892,"ma10":3287.4561000000003,"ma50":3161.6574},{"date":"2026-01-13","open":3390.688,"close":3321.889,"high":3416.837,"low":3307.631,"volume":41954770103.0,"ma5":3334.0086,"ma10":3295.2574,"ma50":3166.108277777778},{"date":"2026-01-14","open":3333.171,"close":3349.138,"high":3403.954,"low":3308.627,"volume":43995841831.0,"ma5":3337.8975999999993,"ma10":3307.9101,"ma50":3171.0550270270273},{"date":"2026-01-15","open":3318.109,"close":3367.917,"high":3372.474,"low":3309.062,"volume":30757654761.0,"ma5":3351.0196000000005,"ma10":3320.4112999999998,"ma50":3176.235605263158},{"date":"2026-01-16","open":3394.346,"close":3361.017,"high":3407.862,"low":3354.649,"volume":29998155132.0,"ma5":3357.6603999999993,"ma10":3336.1958,"ma50":3180.97358974359},{"date":"2026-01-19","open":3340.936,"close":3337.608,"high":3383.789,"low":3326.134,"volume":25640521661.0,"ma5":3347.5137999999997,"ma10":3340.5015,"ma50":3184.8894499999997},{"date":"2026-01-20","open":3340.456,"close":3277.979,"high":3347.944,"low":3257.435,"volume":26073148031.0,"ma5":3338.7318,"ma10":3336.3702,"ma50":3187.1599268292684},{"date":"2026-01-21","open":3270.127,"close":3295.523,"high":3329.502,"low":3270.127,"volume":23018590975.0,"ma5":3328.0087999999996,"ma10":3332.9532,"ma50":3189.74},{"date":"2026-01-22","open":3312.751,"close":3328.647,"high":3337.272,"low":3280.317,"volume":23538932550.0,"ma5":3320.1548000000003,"ma10":3335.5871999999995,"ma50":3192.970395348837},{"date":"2026-01-23","open":3334.017,"close":3349.503,"high":3349.503,"low":3316.654,"volume":29347937166.0,"ma5":3317.8520000000003,"ma10":3337.7562,"ma50":3196.527954545454},{"date":"2026-01-26","open":3365.606,"close":3319.149,"high":3367.992,"low":3304.356,"volume":31480672335.0,"ma5":3314.1602000000007,"ma10":3330.8370000000004,"ma50":3199.2528666666663},{"date":"2026-01-27","open":3316.021,"close":3342.599,"high":3366.683,"low":3277.257,"volume":26646005109.0,"ma5":3327.0842000000002,"ma10":3332.9080000000004,"ma50":3202.369086956521},{"date":"2026-01-28","open":3359.788,"close":3323.562,"high":3361.14,"low":3301.048,"volume":25814224847.0,"ma5":3332.692,"ma10":3330.3504000000003,"ma50":3204.9476595744677},{"date":"2026-01-29","open":3322.48,"close":3304.51,"high":3356.485,"low":3298.588,"volume":29496322405.0,"ma5":3327.8646,"ma10":3324.0097,"ma50":3207.021875},{"date":"2026-01-30","open":3301.541,"close":3346.355,"high":3369.245,"low":3255.648,"volume":26302631763.0,"ma5":3327.2349999999997,"ma10":3322.5435000000007,"ma50":3209.8654081632653},{"date":"2026-02-02","open":3368.141,"close":3264.111,"high":3390.299,"low":3262.122,"volume":23854360757.0,"ma5":3316.2273999999998,"ma10":3315.1938,"ma50":3210.95032},{"date":"2026-02-03","open":3318.06,"close":3324.892,"high":3332.477,"low":3249.061,"volume":23061644766.0,"ma5":3312.686,"ma10":3319.8850999999995,"ma50":3219.0465999999997},{"date":"2026-02-04","open":3298.322,"close":3311.515,"high":3318.898,"low":3244.711,"volume":23731292772.0,"ma5":3310.2765999999997,"ma10":3321.4843,"ma50":3226.6960400000007},{"date":"2026-02-05","open":3277.721,"close":3260.278,"high":3288.375,"low":3238.784,"volume":20529520802.0,"ma5":3301.4302,"ma10":3314.6473999999994,"ma50":3232.28292},{"date":"2026-02-06","open":3222.884,"close":3236.464,"high":3288.032,"low":3199.144,"volume":20940122955.0,"ma5":3279.452,"ma10":3303.3435,"ma50":3236.1183},{"date":"2026-02-09","open":3299.597,"close":3332.77,"high":3340.329,"low":3276.567,"volume":23531193301.0,"ma5":3293.1838,"ma10":3304.7056,"ma50":3242.14778},{"date":"2026-02-10","open":3321.884,"close":3320.537,"high":3348.483,"low":3320.537,"volume":24045837249.0,"ma5":3292.3127999999997,"ma10":3302.4993999999997,"ma50":3247.50678},{"date":"2026-02-11","open":3312.643,"close":3284.735,"high":3324.182,"low":3284.239,"volume":22071512282.0,"ma5":3286.9568,"ma10":3298.6166999999996,"ma50":3251.3515},{"date":"2026-02-12","open":3294.571,"close":3328.063,"high":3334.354,"low":3292.677,"volume":22591739521.0,"ma5":3300.5138000000006,"ma10":3300.972,"ma50":3256.4897799999994},{"date":"2026-02-13","open":3309.429,"close":3275.958,"high":3323.369,"low":3275.289,"volume":20624958923.0,"ma5":3308.4125999999997,"ma10":3293.9322999999995,"ma50":3261.2732200000005},{"date":"2026-02-24","open":3331.795,"close":3308.265,"high":3343.244,"low":3292.5,"volume":22240405558.0,"ma5":3303.5116000000003,"ma10":3298.3477,"ma50":3266.088840000001}]}};
+
         function getEmotionStatus(value) {
             if (value >= 75) return { text: '火爆', color: '#f85149' };
             if (value >= 50) return { text: '良好', color: '#f0883e' };
             if (value >= 25) return { text: '一般', color: '#58a6ff' };
             return { text: '冰点', color: '#238636' };
         }
-        
+
         function formatDate(dateStr) {
             const parts = dateStr.split('-');
             return parts[1] + '-' + parts[2];
         }
-        
-        function updateDateDisplay() {
-            const dateDisplay = document.getElementById('dateDisplay');
-            const prevBtn = document.getElementById('prevDate');
-            const nextBtn = document.getElementById('nextDate');
-            
-            if (marketData.length > 0) {
-                dateDisplay.textContent = marketData[currentDateIndex].date;
-                prevBtn.disabled = currentDateIndex >= marketData.length - 1;
-                nextBtn.disabled = currentDateIndex <= 0;
-            }
+
+        // 全局日期数组，用于图表联动
+        let globalDates = [];
+
+        // 获取情绪数据的日期（作为所有图表的基准）
+        function getSharedDates() {
+            const startDate = '2026-01-01';
+            const filteredData = marketData.filter(d => d.date >= startDate);
+            // 按日期升序排列（早的日期在前）
+            return filteredData.map(d => formatDate(d.date)).sort();
+        }
+
+        // 根据设备类型获取显示数据条数
+        function getDisplayDataCount() {
+            return window.innerWidth < 768 ? 20 : 60;
+        }
+
+        // 截取最近N条数据
+        function getChartData() {
+            // 统一从2026-01-01开始的数据
+            const startDate = '2026-01-01';
+            return marketData.filter(d => d.date >= startDate);
         }
         
-        function renderKlineChart() {
-            const chart = echarts.init(document.getElementById('klineChart'));
-            
-            if (klineData.length === 0) {
-                chart.setOption({
-                    title: { text: '暂无K线数据', left: 'center', textStyle: { color: '#8b949e' } }
-                });
-                return;
-            }
-            
-            const dates = klineData.map(d => formatDate(d.date)).reverse();
-            const klines = klineData.map(d => [d.open, d.close, d.low, d.high]).reverse();
-            const ma5 = klineData.map(d => d.ma5).reverse();
-            const ma10 = klineData.map(d => d.ma10).reverse();
-            const ma50 = klineData.map(d => d.ma50).reverse();
-            
-            chart.setOption({
-                backgroundColor: 'transparent',
-                grid: { left: '6%', right: '8%', bottom: '10%', top: '5%', containLabel: true },
-                xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e', fontSize: 11 } },
-                yAxis: { type: 'value', axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e' }, splitLine: { lineStyle: { color: '#21262d', type: 'dashed' } } },
-                series: [
-                    { name: 'K线', type: 'candlestick', data: klines, itemStyle: { color: '#f85149', color0: '#238636', borderColor: '#f85149', borderColor0: '#238636' } },
-                    { name: 'MA5', type: 'line', data: ma5, smooth: true, lineStyle: { width: 1, color: '#f0883e' }, symbol: 'none' },
-                    { name: 'MA10', type: 'line', data: ma10, smooth: true, lineStyle: { width: 1, color: '#58a6ff' }, symbol: 'none' },
-                    { name: 'MA50', type: 'line', data: ma50, smooth: true, lineStyle: { width: 1, color: '#238636' }, symbol: 'none' }
-                ],
-                tooltip: { trigger: 'axis', backgroundColor: '#161b22', borderColor: '#30363d', textStyle: { color: '#c9d1d9' } }
-            });
+        // 获取K线数据（从2026-01-01开始，并与情绪数据日期对齐）
+        function getKlineData(indexCode) {
+            const startDate = '2026-01-01';
+            const indexData = klineData[indexCode];
+            if (!indexData || !indexData.data) return [];
+            const filtered = indexData.data.filter(d => d.date >= startDate);
+            // 按日期升序排列
+            return filtered.sort((a, b) => a.date.localeCompare(b.date));
         }
-        
+
         function renderSentimentChart() {
-            const chart = echarts.init(document.getElementById('sentimentChart'));
-            const dates = marketData.map(d => formatDate(d.date)).reverse();
-            const values = marketData.map(d => d.sentiment_index).reverse();
+            const chartDom = document.getElementById('sentimentChart');
+            if (!chartDom) return null;
+            
+            // OPPO 浏览器兼容性：强制设置尺寸并清空
+            chartDom.style.width = '100%';
+            chartDom.style.height = window.innerWidth < 768 ? '220px' : '310px';
+            chartDom.innerHTML = '';
+            
+            let chart;
+            try {
+                // 尝试使用 canvas 渲染
+                chart = echarts.init(chartDom, null, { renderer: 'canvas', useDirtyRect: false });
+            } catch (e) {
+                console.error('Canvas init failed, trying svg:', e);
+                try {
+                    chart = echarts.init(chartDom, null, { renderer: 'svg' });
+                } catch (e2) {
+                    console.error('Both renderers failed:', e2);
+                    return null;
+                }
+            }
+            
+            const isMobile = window.innerWidth < 768;
+            // 使用共享日期（与K线图对齐）
+            const sharedDates = getSharedDates();
+            const displayData = getChartData();
+            
+            // 按共享日期顺序准备数据
+            const values = [];
+            const upCounts = [];
+            const limitUpCounts = [];
+            
+            sharedDates.forEach(dateStr => {
+                const fullDate = '2026-' + dateStr;
+                const item = displayData.find(d => d.date === fullDate);
+                if (item) {
+                    values.push(item.sentiment_index);
+                    upCounts.push(item.up_count);
+                    limitUpCounts.push(item.limit_up);
+                } else {
+                    values.push(null);
+                    upCounts.push(null);
+                    limitUpCounts.push(null);
+                }
+            });
+            
+            // 日期已经是升序，直接使用
+            const dates = sharedDates;
             const dataPoints = values.map(val => ({ value: val, itemStyle: { color: getEmotionStatus(val).color } }));
             
             chart.setOption({
                 backgroundColor: 'transparent',
-                grid: { left: '6%', right: '8%', bottom: '10%', top: '5%', containLabel: true },
-                xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e', fontSize: 11, rotate: 45 } },
-                yAxis: { type: 'value', min: 0, max: 100, axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e' }, splitLine: { lineStyle: { color: '#21262d', type: 'dashed' } } },
-                series: [{
-                    name: '情绪指标', data: dataPoints, type: 'line', smooth: true, lineStyle: { width: 2 }, symbol: 'circle', symbolSize: 6,
-                    areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(248,81,73,0.2)' },{ offset: 1, color: 'rgba(35,134,54,0.05)' }] } },
-                    markLine: { silent: true, symbol: 'none', lineStyle: { type: 'dashed', width: 1 }, data: [{ yAxis: 75 },{ yAxis: 50 },{ yAxis: 25 }] }
-                }],
-                tooltip: { trigger: 'axis', backgroundColor: '#161b22', borderColor: '#30363d', textStyle: { color: '#c9d1d9' } }
+                grid: { left: isMobile ? '12%' : '10%', right: isMobile ? '4%' : '4%', bottom: isMobile ? '15%' : '10%', top: '5%', containLabel: false },
+                xAxis: { 
+                    type: 'category', 
+                    data: dates, 
+                    axisLine: { lineStyle: { color: '#30363d' } }, 
+                    axisLabel: { color: '#8b949e', fontSize: isMobile ? 9 : 11, rotate: isMobile ? 60 : 45, interval: isMobile ? 'auto' : 0 },
+                    axisPointer: { show: true, type: 'line', lineStyle: { color: '#8b949e', type: 'dashed' } }
+                },
+                yAxis: [
+                    { type: 'value', min: 0, max: 100, axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e', fontSize: isMobile ? 10 : 12, formatter: function(v) { if(v===100)return'100';if(v===75)return'75';if(v===50)return'50';if(v===25)return'25';if(v===0)return'0';return v; } }, splitLine: { lineStyle: { color: '#21262d', type: 'dashed' } } },
+                    { type: 'value', show: false, min: 0 }
+                ],
+                series: [
+                    {
+                        name: '情绪指标', data: dataPoints, type: 'line', smooth: true, lineStyle: { width: isMobile ? 1.5 : 2, color: '#8b949e' }, symbol: 'circle', symbolSize: isMobile ? 5 : 8,
+                        areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(248,81,73,0.2)' },{ offset: 0.33, color: 'rgba(240,136,62,0.15)' },{ offset: 0.66, color: 'rgba(88,166,255,0.1)' },{ offset: 1, color: 'rgba(35,134,54,0.05)' }] } },
+                        markLine: { silent: true, symbol: 'none', lineStyle: { type: 'dashed', width: 1 }, label: { position: 'end', formatter: '{c}', fontSize: isMobile ? 10 : 12, color: '#8b949e' }, data: [{ yAxis: 75, lineStyle: { color: '#f0883e' } },{ yAxis: 50, lineStyle: { color: '#58a6ff' } },{ yAxis: 25, lineStyle: { color: '#238636' } }] },
+                        markArea: { silent: true, itemStyle: { color: 'transparent' }, label: { show: true, position: 'insideRight', offset: isMobile ? [20, 0] : [30, 0], rotate: 0, fontSize: isMobile ? 12 : 14, fontWeight: 'bold' }, data: [[{ yAxis: 87.5, label: { formatter: '火爆', color: '#c0392b' } },{ yAxis: 87.5 }],[{ yAxis: 62.5, label: { formatter: '良好', color: '#d35400' } },{ yAxis: 62.5 }],[{ yAxis: 37.5, label: { formatter: '一般', color: '#2980b9' } },{ yAxis: 37.5 }],[{ yAxis: 12.5, label: { formatter: '冰点', color: '#27ae60' } },{ yAxis: 12.5 }]] }
+                    },
+                    {
+                        name: '上涨家数', data: upCounts, type: 'line', smooth: true, yAxisIndex: 1, lineStyle: { width: 1, color: 'rgba(248,81,73,0.4)' }, symbol: 'none'
+                    },
+                    {
+                        name: '涨停数', data: limitUpCounts, type: 'line', smooth: true, yAxisIndex: 1, lineStyle: { width: 0 }, symbol: 'none', showSymbol: false }
+                ],
+                tooltip: { 
+                    trigger: 'axis', 
+                    backgroundColor: '#161b22', 
+                    borderColor: '#30363d', 
+                    textStyle: { color: '#c9d1d9', fontSize: isMobile ? 12 : 14 }, 
+                    formatter: function(p) { 
+                        const v=p[0].value; 
+                        const s=getEmotionStatus(v); 
+                        let r='2026-'+p[0].axisValue+'<br/>情绪值: <span style="color:'+s.color+';font-weight:bold;">'+v+'</span> (<span style="color:'+s.color+'">'+s.text+'</span>)'; 
+                        if(p[1])r+='<br/>上涨家数: <span style="color:#f85149">'+p[1].value+'</span>'; 
+                        if(p[2])r+='<br/>涨停数: <span style="color:#f85149">'+p[2].value+'</span>'; 
+                        return r; 
+                    } 
+                }
             });
+            return chart;
         }
-        
+
+        function renderStrengthChart() {
+            const chartDom = document.getElementById('strengthChart');
+            if (!chartDom) return null;
+            
+            // OPPO 浏览器兼容性：强制设置尺寸并清空
+            chartDom.style.width = '100%';
+            chartDom.style.height = window.innerWidth < 768 ? '220px' : '310px';
+            chartDom.innerHTML = '';
+            
+            let chart;
+            try {
+                // 尝试使用 canvas 渲染
+                chart = echarts.init(chartDom, null, { renderer: 'canvas', useDirtyRect: false });
+            } catch (e) {
+                console.error('Canvas init failed, trying svg:', e);
+                try {
+                    chart = echarts.init(chartDom, null, { renderer: 'svg' });
+                } catch (e2) {
+                    console.error('Both renderers failed:', e2);
+                    return null;
+                }
+            }
+            
+            const isMobile = window.innerWidth < 768;
+            // 使用共享日期（与K线图对齐）
+            const sharedDates = getSharedDates();
+            const displayData = getChartData();
+            
+            // 按共享日期顺序准备数据
+            const ma50Values = [];
+            const strongValues = [];
+            
+            sharedDates.forEach(dateStr => {
+                const fullDate = '2026-' + dateStr;
+                const item = displayData.find(d => d.date === fullDate);
+                if (item) {
+                    ma50Values.push(item.ma50_percent || 0);
+                    strongValues.push(item.strong_percent || 0);
+                } else {
+                    ma50Values.push(null);
+                    strongValues.push(null);
+                }
+            });
+            
+            // 日期已经是升序，直接使用
+            const dates = sharedDates;
+            
+            // 获取最后一个数据值
+            const lastMa50 = ma50Values[ma50Values.length - 1];
+            const lastStrong = strongValues[strongValues.length - 1];
+            
+            chart.setOption({
+                backgroundColor: 'transparent',
+                grid: { left: isMobile ? '12%' : '10%', right: isMobile ? '4%' : '8%', bottom: isMobile ? '15%' : '10%', top: '10%', containLabel: false },
+                legend: { show: false },
+                xAxis: { 
+                    type: 'category', 
+                    data: dates, 
+                    axisLine: { lineStyle: { color: '#30363d' } }, 
+                    axisLabel: { color: '#8b949e', fontSize: isMobile ? 9 : 11, rotate: isMobile ? 60 : 45, interval: isMobile ? 'auto' : 0 },
+                    axisPointer: { show: true, type: 'line', lineStyle: { color: '#8b949e', type: 'dashed' } }
+                },
+                yAxis: [
+                    { 
+                        type: 'value', 
+                        name: 'MA50占比', 
+                        min: 0, 
+                        max: 100, 
+                        position: 'left',
+                        axisLine: { lineStyle: { color: '#58a6ff' } }, 
+                        axisLabel: { color: '#58a6ff', fontSize: isMobile ? 10 : 12, formatter: '{value}%' }, 
+                        splitLine: { lineStyle: { color: '#21262d', type: 'dashed' } } 
+                    },
+                    { 
+                        type: 'value', 
+                        name: '强势股占比', 
+                        min: 0, 
+                        max: 50, 
+                        position: 'right',
+                        axisLine: { lineStyle: { color: '#f0883e' } }, 
+                        axisLabel: { color: '#f0883e', fontSize: isMobile ? 10 : 12, formatter: '{value}%' }, 
+                        splitLine: { show: false } 
+                    }
+                ],
+                series: [
+                    {
+                        name: 'MA50占比', 
+                        data: ma50Values.map(v => ({ 
+                            value: v, 
+                            itemStyle: { 
+                                color: v >= 75 ? '#f85149' : (v <= 25 ? '#238636' : '#58a6ff') 
+                            } 
+                        })), 
+                        type: 'line', 
+                        smooth: true, 
+                        yAxisIndex: 0,
+                        lineStyle: { width: isMobile ? 1.5 : 2, color: '#58a6ff' }, 
+                        itemStyle: { color: '#58a6ff' },
+                        symbol: 'circle', 
+                        symbolSize: isMobile ? 4 : 5,
+                        areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(88,166,255,0.25)' },{ offset: 1, color: 'rgba(88,166,255,0.03)' }] } },
+                        markLine: {
+                            silent: true,
+                            symbol: 'none',
+                            lineStyle: { type: 'dashed', width: 1, color: '#58a6ff' },
+                            label: { 
+                                position: 'end', 
+                                formatter: '{c}%', 
+                                fontSize: isMobile ? 10 : 11, 
+                                color: '#58a6ff' 
+                            },
+                            data: [{ yAxis: lastMa50 }]
+                        }
+                    },
+                    {
+                        name: '强势股占比', 
+                        data: strongValues, 
+                        type: 'line', 
+                        smooth: true, 
+                        yAxisIndex: 1,
+                        lineStyle: { width: isMobile ? 1.5 : 2, color: '#f0883e' }, 
+                        itemStyle: { color: '#f0883e' },
+                        symbol: 'circle', 
+                        symbolSize: isMobile ? 4 : 5,
+                        areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: 'rgba(240,136,62,0.25)' },{ offset: 1, color: 'rgba(240,136,62,0.03)' }] } },
+                        markLine: {
+                            silent: true,
+                            symbol: 'none',
+                            lineStyle: { type: 'dashed', width: 1, color: '#f0883e' },
+                            label: { 
+                                position: 'end', 
+                                formatter: '{c}%', 
+                                fontSize: isMobile ? 10 : 11, 
+                                color: '#f0883e' 
+                            },
+                            data: [{ yAxis: lastStrong }]
+                        }
+                    }
+                ],
+                tooltip: { 
+                    trigger: 'axis', 
+                    backgroundColor: '#161b22', 
+                    borderColor: '#30363d', 
+                    textStyle: { color: '#c9d1d9', fontSize: isMobile ? 12 : 14 }, 
+                    formatter: function(p) {
+                        let r = '2026-' + p[0].axisValue + '<br/>';
+                        p.forEach(item => {
+                            const color = item.seriesName === 'MA50占比' ? '#58a6ff' : '#f0883e';
+                            r += '<span style="color:' + color + '">' + item.seriesName + ': ' + item.value + '%</span><br/>';
+                        });
+                        return r;
+                    }
+                }
+            });
+            return chart;
+        }
+
         function renderTable() {
             const tbody = document.querySelector('#dataTable tbody');
             tbody.innerHTML = marketData.map(row => {
                 const s = getEmotionStatus(row.sentiment_index);
                 let c = 'emotion-ice'; 
-                if(row.sentiment_index>=75)c='emotion-hot';else if(row.sentiment_index>=50)c='emotion-good';else if(row.sentiment_index>=25)c='emotion-normal';
-                return '<tr><td>'+row.date+'</td><td class="'+c+'">'+row.sentiment_index+'</td><td>'+Math.round(row.volume||0).toLocaleString()+'</td><td class="up-red">'+(row.up_count||0).toLocaleString()+'</td><td class="down-green">'+(row.down_count||0).toLocaleString()+'</td><td class="up-red">'+(row.limit_up||0)+'</td><td class="down-green">'+(row.limit_down||0)+'</td><td>'+(row.major_pullback||0)+'</td><td>'+(row.consecutive_height||0)+'</td><td>'+(row.consecutive_performance||'-')+'</td><td>'+(row.consecutive_promotion_rate||'-')+'</td><td>'+(row.limit_up_performance||'-')+'</td><td>'+(row.seal_rate||'-')+'</td></tr>';
+                if(row.sentiment_index>=75)c='emotion-hot';
+                else if(row.sentiment_index>=50)c='emotion-good';
+                else if(row.sentiment_index>=25)c='emotion-normal';
+                
+                const ma50 = row.ma50_percent ? row.ma50_percent.toFixed(2) + '%' : '-';
+                const strong = row.strong_percent ? row.strong_percent.toFixed(2) + '%' : '-';
+                
+                return '<tr><td>'+row.date+'</td><td class="'+c+'">'+row.sentiment_index+'</td><td>'+Math.round(row.volume).toLocaleString()+'</td><td class="up-red">'+row.up_count.toLocaleString()+'</td><td class="down-green">'+row.down_count.toLocaleString()+'</td><td class="up-red">'+row.limit_up+'</td><td class="down-green">'+row.limit_down+'</td><td>'+row.major_pullback+'</td><td>'+row.consecutive_height+'</td><td>'+row.consecutive_performance+'</td><td>'+row.consecutive_promotion_rate+'</td><td>'+row.limit_up_performance+'</td><td>'+row.seal_rate+'</td><td>'+ma50+'</td><td>'+strong+'</td></tr>';
             }).join('');
         }
+
+        // K线图表函数
+        let klineChart;
+        let currentIndexCode = '000001'; // 默认上证指数
         
-        function renderAnalysis() {
-            const container = document.getElementById('analysisList');
-            if (dailyReports.length === 0) {
-                container.innerHTML = '<p style="color: #8b949e;">暂无分析结论</p>';
-                return;
+        function renderKlineChart() {
+            const chartDom = document.getElementById('klineChart');
+            if (!chartDom) return null;
+            
+            chartDom.style.width = '100%';
+            chartDom.style.height = window.innerWidth < 768 ? '280px' : '400px';
+            chartDom.innerHTML = '';
+            
+            let chart;
+            try {
+                chart = echarts.init(chartDom, null, { renderer: 'canvas' });
+            } catch (e) {
+                console.error('Kline chart init failed:', e);
+                return null;
             }
-            container.innerHTML = dailyReports.slice(0, 5).map(r => {
-                return '<div class="analysis-card">' +
-                    '<div class="date">'+r.date+'</div>' +
-                    '<div class="phase">'+r.phase+'</div>' +
-                    '<div class="action">'+r.action+'</div>' +
-                    '<div class="summary">'+r.summary+'</div>' +
-                    (r.mowen_link ? '<div class="link"><a href="'+r.mowen_link+'" target="_blank">查看完整分析 →</a></div>' : '') +
-                    '</div>';
-            }).join('');
+            
+            const isMobile = window.innerWidth < 768;
+            const rawData = getKlineData(currentIndexCode);
+            
+            if (!rawData || rawData.length === 0) {
+                console.error('No data for index:', currentIndexCode);
+                return null;
+            }
+            
+            // 使用共享日期（与情绪图表对齐）
+            const sharedDates = getSharedDates();
+            
+            // 准备数据，确保与共享日期对齐
+            const klineData_arr = [];
+            const volumes = [];
+            const ma50Data = [];
+            const amountColors = [];
+            
+            sharedDates.forEach((dateStr, i) => {
+                const fullDate = '2026-' + dateStr;
+                const kItem = rawData.find(d => d.date === fullDate);
+                if (kItem) {
+                    klineData_arr.push([kItem.open, kItem.close, kItem.low, kItem.high]);
+                    volumes.push(kItem.volume);
+                    ma50Data.push(kItem.ma50);
+                    // 计算颜色
+                    if (i === 0) {
+                        amountColors.push(kItem.close >= kItem.open ? '#f85149' : '#238636');
+                    } else {
+                        const prevItem = rawData.find(d => d.date === '2026-' + sharedDates[i-1]);
+                        if (prevItem) {
+                            amountColors.push(kItem.close >= prevItem.close ? '#f85149' : '#238636');
+                        } else {
+                            amountColors.push(kItem.close >= kItem.open ? '#f85149' : '#238636');
+                        }
+                    }
+                } else {
+                    klineData_arr.push([null, null, null, null]);
+                    volumes.push(0);
+                    ma50Data.push(null);
+                    amountColors.push('#30363d');
+                }
+            });
+            
+            // 日期已经是升序，直接使用
+            const dates = sharedDates;
+            
+            chart.setOption({
+                backgroundColor: 'transparent',
+                animation: false,
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'cross', label: { backgroundColor: '#6a7985' } },
+                    backgroundColor: '#161b22',
+                    borderColor: '#30363d',
+                    textStyle: { color: '#c9d1d9', fontSize: isMobile ? 11 : 12 },
+                    formatter: function(params) {
+                        let result = '2026-' + params[0].axisValue + '<br/>';
+                        const kline = params.find(p => p.seriesName === 'K线');
+                        if (kline) {
+                            const data = kline.data;
+                            result += `开: ${data[1]} 收: ${data[2]}<br/>`;
+                            result += `低: ${data[3]} 高: ${data[4]}<br/>`;
+                        }
+                        const vol = params.find(p => p.seriesName === '成交量');
+                        if (vol) {
+                            result += `量: ${(vol.value / 100000000).toFixed(2)}亿`;
+                        }
+                        return result;
+                    }
+                },
+                grid: [
+                    { left: isMobile ? '12%' : '10%', right: isMobile ? '4%' : '4%', top: '8%', height: isMobile ? '55%' : '60%' },
+                    { left: isMobile ? '12%' : '10%', right: isMobile ? '4%' : '4%', top: isMobile ? '72%' : '75%', height: isMobile ? '18%' : '15%' }
+                ],
+                xAxis: [
+                    { type: 'category', data: dates, scale: true, boundaryGap: false, axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e', fontSize: isMobile ? 9 : 10 }, splitLine: { show: false }, min: 'dataMin', max: 'dataMax', axisPointer: { show: true, type: 'line', lineStyle: { color: '#8b949e', type: 'dashed' } } },
+                    { type: 'category', gridIndex: 1, data: dates, scale: true, boundaryGap: false, axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { show: false }, splitLine: { show: false }, min: 'dataMin', max: 'dataMax', axisPointer: { show: true, type: 'line', lineStyle: { color: '#8b949e', type: 'dashed' } } }
+                ],
+                yAxis: [
+                    { scale: true, axisLine: { lineStyle: { color: '#30363d' } }, axisLabel: { color: '#8b949e', fontSize: isMobile ? 9 : 10 }, splitLine: { lineStyle: { color: '#21262d', type: 'dashed' } }, position: 'right' },
+                    { scale: true, gridIndex: 1, splitNumber: 2, axisLine: { show: false }, axisLabel: { show: false }, axisTick: { show: false }, splitLine: { show: false } }
+                ],
+                dataZoom: [
+                    { type: 'inside', xAxisIndex: [0, 1], start: 0, end: 100 }
+                ],
+                series: [
+                    {
+                        name: 'K线',
+                        type: 'candlestick',
+                        data: klineData_arr,
+                        itemStyle: { color: '#f85149', color0: '#238636', borderColor: '#f85149', borderColor0: '#238636' },
+                        barWidth: isMobile ? '60%' : '50%'
+                    },
+                    {
+                        name: 'MA50',
+                        type: 'line',
+                        data: ma50Data,
+                        smooth: true,
+                        lineStyle: { width: 1.5, color: '#58a6ff' },
+                        symbol: 'none'
+                    },
+                    {
+                        name: '成交量',
+                        type: 'bar',
+                        xAxisIndex: 1,
+                        yAxisIndex: 1,
+                        data: volumes,
+                        itemStyle: { color: function(params) { return amountColors[params.dataIndex]; } },
+                        barWidth: isMobile ? '60%' : '50%'
+                    }
+                ]
+            });
+            
+            return chart;
         }
         
-        // 初始化
-        updateDateDisplay();
-        renderKlineChart();
-        renderSentimentChart();
-        renderTable();
-        renderAnalysis();
+        // 切换指数
+        function setupIndexSelector() {
+            const selector = document.getElementById('indexSelector');
+            if (selector) {
+                selector.addEventListener('change', function() {
+                    currentIndexCode = this.value;
+                    if (klineChart) {
+                        klineChart.dispose();
+                    }
+                    klineChart = renderKlineChart();
+                    // 更新数据卡片中的指数数据
+                    updateDataCard(reportDates[currentReportIndex]);
+                    // 重新连接图表联动
+                    if (klineChart && sentimentChart && strengthChart) {
+                        echarts.connect([klineChart, sentimentChart, strengthChart]);
+                    }
+                });
+            }
+        }
         
-        // 事件监听
-        document.getElementById('prevDate').addEventListener('click', () => { if(currentDateIndex < marketData.length-1) { currentDateIndex++; updateDateDisplay(); } });
-        document.getElementById('nextDate').addEventListener('click', () => { if(currentDateIndex > 0) { currentDateIndex--; updateDateDisplay(); } });
-        window.addEventListener('resize', () => { 
-            echarts.getInstanceByDom(document.getElementById('klineChart'))?.resize();
-            echarts.getInstanceByDom(document.getElementById('sentimentChart'))?.resize();
+        function initCharts() {
+            try {
+                // 初始化所有图表
+                klineChart = renderKlineChart();
+                sentimentChart = renderSentimentChart();
+                strengthChart = renderStrengthChart();
+                
+                // 连接所有图表联动
+                const chartsToConnect = [];
+                if (klineChart) chartsToConnect.push(klineChart);
+                if (sentimentChart) chartsToConnect.push(sentimentChart);
+                if (strengthChart) chartsToConnect.push(strengthChart);
+                
+                if (chartsToConnect.length > 1) {
+                    echarts.connect(chartsToConnect);
+                }
+                
+                // 设置指数选择器
+                setupIndexSelector();
+            } catch (e) {
+                console.error('Chart init error:', e);
+            }
+        }
+        
+        // 每日研判数据（含墨问链接）
+        const dailyReports = {"2026-02-24":{"phase":"情绪修复期/新周期启动初期","action":"关注低位首板/二板新题材、科技成长方向；回避节前高位连板股、缩量加速板。","summary":"节后首日情绪修复到位，明日分化预期，控仓参与低位新方向，回避高位接力。","link":"https://note.mowen.cn/detail/rc0D7AXrf2oDPqum2DZaA"},"2026-02-13":{"phase":"退潮期，冰点试探中","action":"关注：冰点期新题材首板、逆势抗跌标。回避：中位股、前期强势股反抽。","summary":"冰点未至，但已在路上。控制仓位，等待市场选出下一个周期的龙头。","link":"https://note.mowen.cn/detail/Qo95HAwI4gtXA8j4FMIU3"},"2026-02-12":{"phase":"震荡期，情绪尝试修复但分歧严重","action":"关注：新题材首板、绝对低位。回避：中位股、趋势破位股。","summary":"假修复不改退潮势，控制仓位等真冰点。","link":"https://note.mowen.cn/detail/Ls7KEwy_eYvE3YtpPnkHX"},"2026-02-11":{"phase":"震荡期偏冷，情绪继续降温","action":"关注：低位新题材、超跌反弹。回避：中高位股、趋势破位股。","summary":"修复力度一般，明日定强弱，控制仓位观望。","link":"https://note.mowen.cn/detail/Q6KbymBwJyxsArXXGpJrW"},"2026-02-10":{"phase":"震荡期，情绪分化","action":"关注：主线龙头、强势板块中军、新题材首板。主升期容错率高。","summary":"主升期初期，重仓参与，明日关注情绪是否过热。","link":"https://note.mowen.cn/detail/6RBj0m5186GoOk066G8Kl"},"2026-02-09":{"phase":"主升期初期，情绪高涨","action":"关注：主线龙头、强势板块中军、新题材首板。积极参与。","summary":"主升期已至，重仓参与，明日关注情绪是否过热。","link":"https://note.mowen.cn/detail/uwzWzfM9dcJvxXrxWsVMV"},"2026-02-06":{"phase":"震荡期，情绪尝试修复但分歧严重","action":"关注：低位新题材首板、超跌反弹标的、4板龙头分歧转一致机会。回避：中位股（2-3板）、趋势破位股、缩量反弹品种。","summary":"震荡期控制仓位，只做低位或绝对核心，回避中位股。","link":"https://note.mowen.cn/detail/RiV6aZ_lE-vPfdZOOER9j"},"2026-02-05":{"phase":"调整期，情绪快速降温","action":"关注：绝对低位首板、超跌反弹标的、空仓等待。回避：中位股（2-3板）、高位股、趋势破位股。","summary":"调整期控制仓位，空仓或只做绝对低位，回避中高位股。","link":"https://note.mowen.cn/detail/MAalxsTPtIK6Q5HxtjHmy"}};
+        
+        const reportDates = ["2026-02-24","2026-02-13","2026-02-12","2026-02-11","2026-02-10","2026-02-09","2026-02-06","2026-02-05","2026-02-04","2026-02-03","2026-02-02","2026-01-30","2026-01-29","2026-01-28","2026-01-27","2026-01-26","2026-01-23","2026-01-22","2026-01-21","2026-01-20","2026-01-19","2026-01-16","2026-01-15","2026-01-14","2026-01-13","2026-01-12","2026-01-09","2026-01-08","2026-01-07","2026-01-06"];
+        let currentReportIndex = 0; // 默认最新一天
+        
+        // 更新数据卡片（关联研判日期）
+        function updateDataCard(date) {
+            const marketItem = marketData.find(d => d.date === date);
+            if (marketItem) {
+                document.getElementById('dataLimitUpDown').innerHTML = `涨停: <span class="up-red">${marketItem.limit_up}</span> / 跌停: <span class="down-green">${marketItem.limit_down}</span>`;
+                
+                // 涨跌家数 + 涨跌比
+                const up = marketItem.up_count;
+                const down = marketItem.down_count;
+                const ratio = down > 0 ? (up / down).toFixed(2) : 'N/A';
+                document.getElementById('dataUpDownCountRatio').innerHTML = `上涨: <span class="up-red">${up.toLocaleString()}</span> / 下跌: <span class="down-green">${down.toLocaleString()}</span> (${ratio}:1)`;
+                
+                document.getElementById('dataConsecutiveHeight').textContent = `${marketItem.consecutive_height}板`;
+                
+                // 成交额及变化
+                const prevItem = marketData.find(d => d.date < date);
+                const volumeChange = prevItem ? ((marketItem.volume - prevItem.volume) / prevItem.volume * 100).toFixed(1) : '0.0';
+                const volumeChangeClass = parseFloat(volumeChange) >= 0 ? 'up-red' : 'down-green';
+                const volumeChangeSymbol = parseFloat(volumeChange) >= 0 ? '+' : '';
+                document.getElementById('dataVolume').innerHTML = `${Math.round(marketItem.volume).toLocaleString()}亿 <span class="${volumeChangeClass}">(${volumeChangeSymbol}${volumeChange}%)</span>`;
+            }
+            
+            // 上证指数数据（点位+涨跌幅）
+            const szIndexData = klineData['000001'].data;
+            if (szIndexData) {
+                // 找到当前日期的索引
+                const currentIndex = szIndexData.findIndex(d => d.date === date);
+                if (currentIndex >= 0) {
+                    const item = szIndexData[currentIndex];
+                    // 前一个交易日就是数组中的前一项（因为数据是按日期升序排列的）
+                    const prevItem = currentIndex > 0 ? szIndexData[currentIndex - 1] : null;
+                    const close = item.close;
+                    const change = prevItem ? ((close - prevItem.close) / prevItem.close * 100).toFixed(2) : '0.00';
+                    const changeClass = parseFloat(change) >= 0 ? 'up-red' : 'down-green';
+                    const changeSymbol = parseFloat(change) >= 0 ? '+' : '';
+                    
+                    document.getElementById('dataIndexCloseChange').innerHTML = `${close.toFixed(2)} <span class="${changeClass}">(${changeSymbol}${change}%)</span>`;
+                }
+            }
+        }
+        
+        // 切换研判日期
+        function switchReport(direction) {
+            const newIndex = currentReportIndex + direction;
+            if (newIndex >= 0 && newIndex < reportDates.length) {
+                currentReportIndex = newIndex;
+                const date = reportDates[currentReportIndex];
+                loadReport(date);
+                updateDateSwitcher();
+                updateDataCard(date); // 同步更新数据卡片
+            }
+        }
+        
+        // 更新日期切换器状态
+        function updateDateSwitcher() {
+            const date = reportDates[currentReportIndex];
+            document.getElementById('dateDisplay').textContent = date;
+            // 左箭头（prev）看更早日期，索引增加；右箭头（next）看更新日期，索引减少
+            document.getElementById('prevDate').disabled = currentReportIndex === reportDates.length - 1;
+            document.getElementById('nextDate').disabled = currentReportIndex === 0;
+        }
+        
+        // 加载研判内容
+        function loadReport(date) {
+            const report = dailyReports[date];
+            if (report) {
+                document.getElementById('reportPhase').textContent = report.phase;
+                document.getElementById('reportAction').textContent = report.action;
+                document.getElementById('reportSummary').textContent = report.summary;
+                document.getElementById('reportLink').href = report.link;
+                document.getElementById('reportLink').style.display = report.link ? 'inline-block' : 'none';
+            } else {
+                document.getElementById('reportPhase').textContent = '';
+                document.getElementById('reportAction').textContent = '';
+                document.getElementById('reportSummary').textContent = '';
+                document.getElementById('reportLink').style.display = 'none';
+            }
+        }
+        
+        // 显示/隐藏完整表格
+        function showFullTable() {
+            document.getElementById('fullTableContainer').style.display = 'block';
+            renderTable();
+            document.getElementById('fullTableContainer').scrollIntoView({behavior: 'smooth'});
+        }
+        
+        function hideFullTable() {
+            document.getElementById('fullTableContainer').style.display = 'none';
+        }
+        
+        // DOM 加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCharts);
+        } else {
+            initCharts();
+        }
+        
+        // 初始化研判
+        const initialDate = reportDates[currentReportIndex];
+        loadReport(initialDate);
+        updateDateSwitcher();
+        updateDataCard(initialDate); // 初始化数据卡片
+        
+        // 响应式调整 - 使用防抖
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (klineChart) klineChart.resize();
+                if (sentimentChart) sentimentChart.resize();
+                if (strengthChart) strengthChart.resize();
+            }, 250);
         });
+
+        
+        // Phase 3: 模块化重构（不改变原有逻辑，只添加模块）
+        const EventBus = {
+            events: {},
+            on(e, t) { (this.events[e] ||= []).push(t); },
+            emit(e, d) { this.events[e]?.forEach(t => t(d)); }
+        };
+
+        const DataManager = {
+            getCurrentDate() { return reportDates[currentReportIndex]; },
+            getCurrentReport() { return dailyReports[this.getCurrentDate()]; },
+            getCurrentMarketData() { return marketData.find(d => d.date === this.getCurrentDate()); }
+        };
+
+        const ChartManager = {
+            charts: { kline: null, sentiment: null, strength: null },
+            get(name) { return this.charts[name]; },
+            set(name, chart) { this.charts[name] = chart; }
+        };
+
+        // Phase 1: localStorage 缓存
+        const DataCache = {
+            KEYS: { MARKET_DATA: 'dx_market_data_v1', LAST_UPDATE: 'dx_last_update_v1' },
+            CACHE_TTL: 5 * 60 * 1000,
+            get(key) {
+                try {
+                    const item = localStorage.getItem(key);
+                    if (!item) return null;
+                    const data = JSON.parse(item);
+                    if (Date.now() - data.timestamp < this.CACHE_TTL) return data.value;
+                    this.remove(key);
+                    return null;
+                } catch (e) { return null; }
+            },
+            set(key, value) {
+                try { localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), value })); }
+                catch (e) { this.clear(); }
+            },
+            remove(key) { try { localStorage.removeItem(key); } catch (e) {} },
+            clear() {
+                Object.values(this.KEYS).forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+            }
+        };
+
+        // Phase 4: 增量数据更新支持
+        DataManager.mergeIncrementalData = function(incData) {
+            if (incData.market_data) {
+                const map = new Map(marketData.map(d => [d.date, d]));
+                incData.market_data.forEach(d => map.set(d.date, d));
+                marketData.length = 0;
+                marketData.push(...Array.from(map.values()).sort((a, b) => b.date.localeCompare(a.date)));
+            }
+            if (incData.daily_reports) {
+                Object.assign(dailyReports, incData.daily_reports);
+                reportDates.length = 0;
+                reportDates.push(...Object.keys(dailyReports).sort());
+                currentReportIndex = reportDates.length - 1;
+            }
+        };
+
+        // 页面加载后尝试增量更新（延迟1秒，避免阻塞初始渲染）
+        setTimeout(async () => {
+            try {
+                const res = await fetch('api/data.json?t=' + Date.now());
+                const data = await res.json();
+                if (data.version === 'incremental-v1') {
+                    DataManager.mergeIncrementalData(data);
+                    // 更新图表
+                    initCharts();
+                    const date = DataManager.getCurrentDate();
+                    loadReport(date);
+                    updateDateSwitcher();
+                    updateDataCard(date);
+                }
+            } catch (e) { console.log('增量更新失败:', e); }
+        }, 1000);
     </script>
 </body>
 </html>
