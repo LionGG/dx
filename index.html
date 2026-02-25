@@ -540,9 +540,8 @@
                 else if(row.sentiment_index>=25)c='emotion-normal';
                 
                 const ma50 = row.ma50_percent ? row.ma50_percent.toFixed(2) + '%' : '-';
-                const strong = row.strong_percent ? row.strong_percent.toFixed(2) + '%' : '-';
                 
-                return '<tr><td>'+row.date+'</td><td class="'+c+'">'+row.sentiment_index+'</td><td>'+Math.round(row.volume).toLocaleString()+'</td><td class="up-red">'+row.up_count.toLocaleString()+'</td><td class="down-green">'+row.down_count.toLocaleString()+'</td><td class="up-red">'+row.limit_up+'</td><td class="down-green">'+row.limit_down+'</td><td>'+row.major_pullback+'</td><td>'+row.consecutive_height+'</td><td>'+row.consecutive_performance+'</td><td>'+row.consecutive_promotion_rate+'</td><td>'+row.limit_up_performance+'</td><td>'+row.seal_rate+'</td><td>'+ma50+'</td><td>'+strong+'</td></tr>';
+                return '<tr><td>'+row.date+'</td><td class="'+c+'">'+row.sentiment_index+'</td><td>'+Math.round(row.volume).toLocaleString()+'</td><td class="up-red">'+row.up_count.toLocaleString()+'</td><td class="down-green">'+row.down_count.toLocaleString()+'</td><td class="up-red">'+row.limit_up+'</td><td class="down-green">'+row.limit_down+'</td><td>'+row.major_pullback+'</td><td>'+row.consecutive_height+'</td><td>'+row.consecutive_performance+'</td><td>'+row.consecutive_promotion_rate+'</td><td>'+row.limit_up_performance+'</td><td>'+row.seal_rate+'</td><td>'+ma50+'</td></tr>';
             }).join('');
         }
 
