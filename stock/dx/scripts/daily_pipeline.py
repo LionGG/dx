@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-每日自动化流程 - 16:00 执行
+每日自动化流程
 
 流程: 数据抓取 → AI分析 → HTML生成 → 部署
 只推送 index.html，其他文件不动
@@ -8,8 +8,8 @@
 用法:
     python3 scripts/daily_pipeline.py
 
-定时任务 (已配置):
-    0 16 * * * cd /root/.openclaw/workspace/stock/dx && python3 scripts/daily_pipeline.py >> logs/daily_$(date +\%Y\%m\%d).log 2>&1
+定时任务配置 (crontab):
+    20 16 * * * cd /root/.openclaw/workspace/stock/dx && python3 scripts/daily_pipeline.py >> logs/daily_$(date +\%Y\%m\%d).log 2>&1
 """
 
 import subprocess
