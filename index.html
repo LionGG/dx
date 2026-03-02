@@ -587,7 +587,7 @@
                 const kItem = rawData.find(d => d.date === fullDate);
                 if (kItem) {
                     klineData_arr.push([kItem.open, kItem.close, kItem.low, kItem.high]);
-                    amounts.push(kItem.amount);
+                    amounts.push(kItem.volume);
                     ma50Data.push(kItem.ma50);
                     // 计算颜色
                     if (i === 0) {
@@ -628,9 +628,9 @@
                             result += `开: ${data[1]} 收: ${data[2]}<br/>`;
                             result += `低: ${data[3]} 高: ${data[4]}<br/>`;
                         }
-                        const vol = params.find(p => p.seriesName === '成交额');
+                        const vol = params.find(p => p.seriesName === '成交量');
                         if (vol) {
-                            result += `额: ${(vol.value / 100000000).toFixed(2)}亿`;
+                            result += `量: ${(vol.value / 100000000).toFixed(2)}亿`;
                         }
                         return result;
                     }
@@ -667,7 +667,7 @@
                         symbol: 'none'
                     },
                     {
-                        name: '成交额',
+                        name: '成交量',
                         type: 'bar',
                         xAxisIndex: 1,
                         yAxisIndex: 1,
