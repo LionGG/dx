@@ -1,0 +1,23 @@
+# A-Share Warehouse 数据获取定时任务
+# 编辑后执行: crontab cron_schedule.txt
+
+# 15:02 - 个股数据同步（从MySQL）
+2 15 * * 1-5 /root/.openclaw/workspace/stock/a-share-warehouse/scripts/cron_1502_stock.sh
+
+# 15:05 - 指数数据（9个指数，失败则16:00重试）
+5 15 * * 1-5 /root/.openclaw/workspace/stock/a-share-warehouse/scripts/cron_1505_index.sh
+
+# 16:00 - 指数数据重试（如果15:05失败）
+0 16 * * 1-5 /root/.openclaw/workspace/stock/a-share-warehouse/scripts/cron_1505_index.sh
+
+# 16:01 - 板块数据（几百个板块）
+1 16 * * 1-5 /root/.openclaw/workspace/stock/a-share-warehouse/scripts/cron_1601_sector.sh
+
+# 16:10 - 涨停板生态（涨停池、跌停池、炸板池、强势股池）
+10 16 * * 1-5 /root/.openclaw/workspace/stock/a-share-warehouse/scripts/cron_1610_zt.sh
+
+# 17:50 - 龙虎榜和资金流向
+50 17 * * 1-5 /root/.openclaw/workspace/stock/a-share-warehouse/scripts/cron_1750_lhb_fund.sh
+
+# 周六 02:00 - 板块与个股关系（增量更新）
+0 2 * * 6 /root/.openclaw/workspace/stock/a-share-warehouse/scripts/cron_sat_0200_sector_stocks.sh

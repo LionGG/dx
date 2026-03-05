@@ -1,0 +1,24 @@
+[2026-02-26 16:13:48] 开始获取板块数据
+[2026-02-26 16:13:48] 开始获取板块数据 - 2026-02-26 16:13:48
+[2026-02-26 16:13:48]   需要补全的日期: ['2026-02-26', '2026-02-25', '2026-02-24', '2026-02-23', '2026-02-22']
+[2026-02-26 16:13:48]   获取 2026-02-26 板块数据...
+[2026-02-26 16:13:54]     行业板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:13:59]     概念板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:13:59]   2026-02-26: 板块K线 0 条
+[2026-02-26 16:14:00]   获取 2026-02-25 板块数据...
+[2026-02-26 16:14:06]     行业板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:14:11]     概念板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:14:11]   2026-02-25: 板块K线 0 条
+[2026-02-26 16:14:12]   获取 2026-02-24 板块数据...
+[2026-02-26 16:14:17]     行业板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:14:22]     概念板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:14:22]   2026-02-24: 板块K线 0 条
+[2026-02-26 16:14:23]   获取 2026-02-23 板块数据...
+[2026-02-26 16:14:29]     行业板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:14:34]     概念板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:14:34]   2026-02-23: 板块K线 0 条
+[2026-02-26 16:14:35]   获取 2026-02-22 板块数据...
+[2026-02-26 16:14:41]     行业板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:14:46]     概念板块失败: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+[2026-02-26 16:14:46]   2026-02-22: 板块K线 0 条
+[2026-02-26 16:14:47] 完成

@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "skills": {
+    "proactive-agent": {
+      "version": "3.1.0",
+      "installedAt": 1772629923886
+    },
+    "self-improving-agent": {
+      "version": "1.0.11",
+      "installedAt": 1772630114544
+    },
+    "memory-setup": {
+      "version": "1.0.0",
+      "installedAt": 1772630143598
+    },
+    "automation-workflows": {
+      "version": "0.1.0",
+      "installedAt": 1772630149254
+    }
+  }
+}

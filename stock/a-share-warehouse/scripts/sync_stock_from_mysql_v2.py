@@ -25,11 +25,17 @@ from trading_date import is_trading_date
 sys.path.insert(0, SCRIPT_DIR)
 from trading_date import is_trading_date
 
-MYSQL_HOST = '82.156.239.131'
-MYSQL_PORT = 3306
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = '1q2w#E$R'
-MYSQL_DB = 'choose_stock'
+# 导入secrets管理
+sys.path.insert(0, '/root/.openclaw/workspace/scripts')
+from secrets_manager import get_mysql_config
+
+# 从secrets获取MySQL配置
+_mysql_config = get_mysql_config()
+MYSQL_HOST = _mysql_config['host']
+MYSQL_PORT = int(_mysql_config['port'])
+MYSQL_USER = _mysql_config['user']
+MYSQL_PASSWORD = _mysql_config['password']
+MYSQL_DB = _mysql_config['database']
 
 def log(msg):
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

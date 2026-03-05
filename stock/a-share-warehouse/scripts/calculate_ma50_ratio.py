@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-MA50占比计算 - 生成趋势图
+MA50占比计算 - 生成趋势图并推送
 
-计算MA50占比，生成图片
-输出结果供OpenClaw捕获推送
+逻辑：
+1. 数据结果（占比、趋势图）→ 发到飞书群
+2. 执行状态（成功/失败）→ 只打印到控制台，由调用方判断
 """
 
 import sqlite3
@@ -13,26 +14,37 @@ import matplotlib
 matplotlib.use('Agg')
 import os
 from datetime import datetime
+import subprocess
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
 DB_PATH = os.path.join(PROJECT_DIR, 'data', 'akshare_full.db')
 OUTPUT_PATH = os.path.join(PROJECT_DIR, 'ma50_ratio_trend.png')
 
-import sys
-sys.path.insert(0, SCRIPT_DIR)
-from feishu_notifier import send_to_feishu_group
-import subprocess
-
-def send_text_with_image_local(text, image_path):
-    """调用外部脚本发送文字+图片"""
-    result = subprocess.run(
-        ['python3', '/root/.openclaw/workspace/send-to-feishu-group.py', 'both', text, image_path],
-        capture_output=True, text=True
-    )
-    return result.returncode == 0
+def send_to_group(text, image_path=None):
+    """
+    发送数据结果到飞书群
+    这是给所有人看的数据
+    """
+    if image_path and os.path.exists(image_path):
+        # 发送文字+图片
+        result = subprocess.run(
+            ['python3', '/root/.openclaw/workspace/send-to-feishu-group.py', 'both', text, image_path],
+            capture_output=True, text=True
+        )
+        return result.returncode == 0
+    else:
+        # 只发送文字
+        import sys
+        sys.path.insert(0, SCRIPT_DIR)
+        from feishu_notifier import send_to_feishu_group
+        return send_to_feishu_group(text)
 
 def log(msg):
+    """
+    记录执行日志（只在控制台输出，不发到群里）
+    这是给开发者/管理员看的执行状态
+    """
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(f"[{now}] {msg}")
 
@@ -130,7 +142,7 @@ def calculate_ma50_ratio():
     step = max(1, len(df) // 10)
     plt.xticks(x[::step], df['date'].iloc[::step], rotation=45)
     
-    plt.title('A股MA50占比趋势 (2026)', fontsize=14)
+    plt.title('A-Share MA50 Ratio Trend (2026)', fontsize=14)
     plt.xlabel('Trading Day')
     plt.ylabel('Ratio (%)')
     plt.ylim(30, 90)
@@ -162,16 +174,16 @@ def main():
     
     if data is None:
         log("任务失败：无法计算MA50占比")
+        # 返回错误码，由调用方决定是否通知个人
         return 1
     
     # 获取昨天数据对比
     change_str = f"{data['change']:+.2f}%" if data['change'] is not None else "N/A"
     yesterday_str = f"{data['yesterday_ratio']:.2f}%" if data['yesterday_ratio'] is not None else "N/A"
     
-    # 发送飞书群消息（文字+图片）
-    group_message = f"""✅ MA50占比计算执行成功 - {data['date']}
+    # 组装数据结果（发到群里给大家看）
+    group_message = f"""📊 MA50占比日报 - {data['date']}
 
-📊 统计结果
 ━━━━━━━━━━━━━━━━━━━━━
 总股票数: {data['total']}只
 MA50上方: {data['above']}只 ({data['ratio']:.2f}%) 🟢
@@ -183,31 +195,12 @@ MA50下方: {data['total'] - data['above']}只 ({100 - data['ratio']:.2f}%) 🔴
 今天: {data['ratio']:.2f}%
 变化: {change_str}"""
     
-    # 使用昨天的方法发送文字+图片
-    send_text_with_image_local(group_message, OUTPUT_PATH)
-    log("飞书群文字+图片已发送")
-    
-    # 输出结果
-    personal_message = f"""✅ MA50占比计算执行成功 - {data['date']}
-
-📊 统计结果
-━━━━━━━━━━━━━━━━━━━━━
-总股票数: {data['total']}只
-MA50上方: {data['above']}只 ({data['ratio']:.2f}%) 🟢
-MA50下方: {data['total'] - data['above']}只 ({100 - data['ratio']:.2f}%) 🔴
-━━━━━━━━━━━━━━━━━━━━━
-
-📈 趋势对比
-昨天: {yesterday_str}
-今天: {data['ratio']:.2f}%
-变化: {change_str}
-
-📁 图片已发送到飞书群"""
-    
-    print(personal_message)
-    
-    # 发送飞书群消息
-    send_to_feishu_group(personal_message)
+    # 发送数据结果到飞书群
+    success = send_to_group(group_message, OUTPUT_PATH)
+    if success:
+        log("数据结果已发送到飞书群")
+    else:
+        log("警告：发送到飞书群失败")
     
     log("任务完成")
     return 0
