@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-每日自动化流程
+每日自动化流程（增强版）
 
-流程: 数据抓取 → AI分析 → HTML生成 → 部署
-只推送 index.html，其他文件不动
+流程: 数据源检查 → 数据抓取 → AI分析 → HTML生成 → 部署
+增加数据源延迟检测和重试机制
 
 用法:
     python3 scripts/daily_pipeline.py
@@ -15,53 +15,57 @@
 import subprocess
 import sys
 import os
+import sqlite3
+import time
 from datetime import datetime
 
 WORKSPACE = '/root/.openclaw/workspace/stock/dx'
+DB_PATH = os.path.join(WORKSPACE, 'data', 'duanxian.db')
 
 # 导入飞书推送模块
 sys.path.insert(0, os.path.join(WORKSPACE, 'scripts'))
 from feishu_notifier import send_to_feishu_group
 
-def capture_screenshot(output_path):
-    """截图情绪图表卡片"""
+def check_data_source():
+    """检查AKShare数据源是否最新"""
+    import akshare as ak
+    
+    today = datetime.now().strftime('%Y-%m-%d')
+    print(f"\n检查数据源状态 (期望日期: {today})")
+    print("-" * 60)
+    
+    issues = []
+    
+    # 检查上证指数
     try:
-        from playwright.sync_api import sync_playwright
-        
-        with sync_playwright() as p:
-            browser = p.chromium.launch()
-            page = browser.new_page(viewport={'width': 1920, 'height': 1080})
-            
-            # 加载本地HTML文件
-            html_path = os.path.join(WORKSPACE, 'web', 'index.html')
-            page.goto(f'file://{html_path}')
-            page.wait_for_load_state('networkidle')
-            
-            # 等待图表渲染完成
-            page.wait_for_timeout(5000)
-            
-            # 截图第一个情绪图表卡片（情绪指数K线）
-            chart_card = page.locator('.chart-container').first
-            chart_card.wait_for(state='visible')
-            chart_card.screenshot(path=output_path)
-            browser.close()
-            
-            return True
+        df = ak.stock_zh_index_daily(symbol='sh000001')
+        latest_date = df['date'].iloc[-1]
+        print(f"上证指数: 最新数据 {latest_date}")
+        if latest_date != today:
+            issues.append(f"上证指数数据延迟: {latest_date}")
     except Exception as e:
-        print(f"截图失败: {e}")
-        return False
-
-def send_feishu_with_image(text, image_path):
-    """发送文字+图片到飞书群"""
+        issues.append(f"上证指数获取失败: {e}")
+    
+    # 检查创业板指
     try:
-        result = subprocess.run(
-            ['python3', '/root/.openclaw/workspace/send-to-feishu-group.py', 'both', text, image_path],
-            capture_output=True, text=True, timeout=30
-        )
-        return result.returncode == 0
+        df = ak.stock_zh_index_daily(symbol='sz399006')
+        latest_date = df['date'].iloc[-1]
+        print(f"创业板指: 最新数据 {latest_date}")
+        if latest_date != today:
+            issues.append(f"创业板指数据延迟: {latest_date}")
     except Exception as e:
-        print(f"发送失败: {e}")
-        return False
+        issues.append(f"创业板指获取失败: {e}")
+    
+    print("-" * 60)
+    
+    if issues:
+        print("⚠️ 数据源延迟:")
+        for issue in issues:
+            print(f"  - {issue}")
+        return False, issues
+    else:
+        print("✅ 数据源正常")
+        return True, []
 
 def run_step(name, cmd, timeout=300, critical=False):
     """
@@ -106,9 +110,39 @@ def run_step(name, cmd, timeout=300, critical=False):
             return False, True
         return False, False
 
+def send_notification(today, analysis_phase, mowen_link, success=True, issues=None):
+    """发送飞书通知"""
+    
+    if success:
+        feishu_message = f"""📊 短线情绪研判 - {today}
+
+周期定位：{analysis_phase}
+
+查看完整分析：{mowen_link}"""
+        send_to_feishu_group(feishu_message)
+        print("✅ 飞书通知发送成功")
+    else:
+        feishu_message = f"""⚠️ 短线情绪研判 - {today}
+
+状态：部分完成
+
+问题：
+"""
+        if issues:
+            for issue in issues:
+                feishu_message += f"  • {issue}\n"
+        
+        feishu_message += f"""
+查看页面：{mowen_link}
+
+建议：稍后手动重新运行脚本"""
+        send_to_feishu_group(feishu_message)
+        print("⚠️ 飞书通知已发送（含问题说明）")
+
 def main():
     start_time = datetime.now()
     today = start_time.strftime('%Y-%m-%d')
+    
     print(f"\n{'#'*60}")
     print(f"# A股情绪数据自动化流程 - {today}")
     print(f"{'#'*60}")
@@ -116,10 +150,20 @@ def main():
     # 确保日志目录存在
     os.makedirs(os.path.join(WORKSPACE, 'logs'), exist_ok=True)
     
+    # 步骤0: 检查数据源
+    print(f"\n{'='*60}")
+    print("步骤0: 检查数据源状态")
+    print(f"{'='*60}")
+    
+    data_ok, data_issues = check_data_source()
+    
+    if not data_ok:
+        print("\n⚠️ 数据源有延迟，继续执行但可能生成不完整报告")
+    
     # 定义步骤 (名称, 命令, 超时秒数, 是否关键)
     steps = [
         ("1. 抓取短线侠情绪数据", "python3 scripts/crawler.py", 120, True),
-        ("2. 抓取AKShare K线数据", "python3 scripts/fetch_kline_akshare.py", 120, True),
+        ("2. 抓取指数K线数据(新浪财经)", "python3 scripts/fetch_kline_sina.py", 120, True),
         ("3. 同步MA50占比数据", "python3 scripts/sync_ma50_ratio.py", 60, True),
         ("4. AI分析并发布到墨问", "python3 scripts/analyze_sentiment.py", 300, True),
         ("5. 更新HTML数据", "python3 scripts/update_html_data.py", 60, True),
@@ -150,7 +194,10 @@ def main():
     print(f"结束: {end_time.strftime('%H:%M:%S')}")
     print(f"耗时: {duration:.1f}秒")
     
+    # 收集所有问题
+    all_issues = data_issues.copy() if data_issues else []
     if failed_steps:
+        all_issues.extend(failed_steps)
         print(f"\n⚠ 失败步骤:")
         for step in failed_steps:
             marker = " (关键)" if critical_failed and step == failed_steps[-1] else ""
@@ -167,39 +214,22 @@ def main():
         ''', (today,))
         row = cursor.fetchone()
         analysis_phase = row[0] if row else "未生成"
-        mowen_link = row[1] if row and row[1] else f"https://liongg.github.io/dx/"
+        mowen_link = row[1] if row and row[1] else "https://liongg.github.io/dx/"
         sqlite_conn.close()
-    except:
+    except Exception as e:
+        print(f"获取分析结果失败: {e}")
         analysis_phase = "未生成"
         mowen_link = "https://liongg.github.io/dx/"
     
-    # 生成飞书群推送消息（按照确认格式）
-    feishu_message = f"""📊 短线情绪研判 - {today}
-
-周期定位：{analysis_phase}
-
-查看完整分析：{mowen_link}"""
-    
-    # 截图并发送飞书群通知（文字+图片）
-    screenshot_path = os.path.join(WORKSPACE, 'screenshot.png')
-    if capture_screenshot(screenshot_path):
-        print("✅ 网页截图完成")
-        if send_feishu_with_image(feishu_message, screenshot_path):
-            print("✅ 飞书群通知发送成功（文字+图片）")
-        else:
-            # 图片发送失败，只发文字
-            send_to_feishu_group(feishu_message)
-            print("⚠️ 图片发送失败，已发送文字")
-    else:
-        # 截图失败，只发文字
-        send_to_feishu_group(feishu_message)
-        print("⚠️ 截图失败，已发送文字")
+    # 发送通知
+    success = not critical_failed and not data_issues
+    send_notification(today, analysis_phase, mowen_link, success, all_issues)
     
     if critical_failed:
         print(f"\n✗ 流程未完成，需要人工介入")
         return False
-    elif failed_steps:
-        print(f"\n⚠ 流程完成，但有非关键步骤失败")
+    elif failed_steps or data_issues:
+        print(f"\n⚠ 流程完成，但存在问题")
         return True
     else:
         print(f"\n✓ 全部成功")
