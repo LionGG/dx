@@ -1,40 +1,51 @@
 # TOOLS.md - Local Notes
 
-Skills define _how_ tools work. This file is for _your_ specifics — the stuff that's unique to your setup.
+## 飞书配置
 
-## What Goes Here
+### 我的飞书 Open ID
+- **Open ID**: `ou_d19a3f0cab037174af62cc8e9e430192`
+- **应用 ID**: `cli_a91e22f1e138dbef`
+- **获取方式**: 从飞书消息 mention 标签中解析
 
-Things like:
-
-- Camera names and locations
-- SSH hosts and aliases
-- Preferred voices for TTS
-- Speaker/room names
-- Device nicknames
-- Anything environment-specific
-
-## Examples
-
-```markdown
-### Cameras
-
-- living-room → Main area, 180° wide angle
-- front-door → Entrance, motion-triggered
-
-### SSH
-
-- home-server → 192.168.1.100, user: admin
-
-### TTS
-
-- Preferred voice: "Nova" (warm, slightly British)
-- Default speaker: Kitchen HomePod
-```
-
-## Why Separate?
-
-Skills are shared. Your setup is yours. Keeping them apart means you can update skills without losing your notes, and share skills without leaking your infrastructure.
+### 飞书群配置
+- dmPolicy: pairing（私聊需要配对）
+- groupPolicy: open（所有群都响应）
+- requireMention: true（群里需要@才响应）
 
 ---
 
-Add whatever helps you do your job. This is your cheat sheet.
+## 邮箱配置（发邮件Skill）
+
+### QQ邮箱（Billy）
+- **邮箱**: 113314650@qq.com
+- **SMTP服务器**: smtp.qq.com
+- **端口**: 587
+- **授权码**: 存储在 `~/.openclaw/secrets/qq_email_auth_code`
+- **配置文件**: `~/.openclaw/secrets/email_config.json`
+- **Skill路径**: `~/.openclaw/workspace/skills/send-email/`
+
+### 快速发邮件命令
+```python
+from skills.send-email.send_email import send_email
+
+send_email(
+    to="收件人@example.com",
+    subject="邮件主题",
+    body="邮件正文",
+    cc="抄送@example.com"  # 可选
+)
+```
+
+---
+
+## 与其他龙虾的区别
+
+**小木（另一只龙虾）:**
+- 直接运行在飞书机器人后端
+- 能直接解析飞书消息原始JSON
+- 能看到完整的 sender_id、mention 等元数据
+
+**我（薄荷）:**
+- 通过 Kimi-Claw 桥接运行
+- 无法直接访问飞书原始消息元数据
+- 需要通过其他方式获取自身信息

@@ -1,5 +1,27 @@
 # HEARTBEAT.md
 
-# Keep this file empty (or with only comments) to skip heartbeat API calls.
+# 心跳检查任务 - 每30分钟执行一次
 
-# Add tasks below when you want the agent to check something periodically.
+## 检查项
+
+### 1. 定时任务状态检查
+- 检查今天是否有失败的定时任务
+- 检查是否有未执行的任务
+
+### 2. 内存检查
+- 检查memory/目录是否有今天的记录
+- 如果没有，创建今天的记录
+
+### 3. 错误预防检查
+- 快速浏览ERROR_PREVENTION.md
+- 提醒自己不要重复犯错
+
+### 4. 主动汇报
+- 如果有问题，立即汇报
+- 如果没问题，回复HEARTBEAT_OK
+
+## 执行顺序
+1. 检查定时任务状态
+2. 检查内存记录
+3. 浏览错误预防文档
+4. 汇报状态

@@ -1,0 +1,457 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "86f91572-7f40-4da3-9676-0d18709c5064",
+      "agentId": "main",
+      "name": "交易计划分析",
+      "enabled": true,
+      "createdAtMs": 1771864435979,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "10 9 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "交易计划分析",
+        "command": "python3 /root/.openclaw/workspace/scripts/trading_plan_analysis.py",
+        "timeout": 120,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {
+        "nextRunAtMs": 1772500200000,
+        "lastRunAtMs": 1772413800008,
+        "lastStatus": "ok",
+        "lastDurationMs": 255676,
+        "consecutiveErrors": 0,
+        "lastRunStatus": "ok",
+        "lastDeliveryStatus": "unknown"
+      },
+      "announce": true,
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      }
+    },
+    {
+      "id": "cb2d643a-d37e-4558-b5d4-61aea0df3212",
+      "agentId": "main",
+      "name": "板块成分股更新",
+      "enabled": false,
+      "createdAtMs": 1772008028256,
+      "updatedAtMs": 1772180494666,
+      "schedule": {
+        "expr": "0 2 * * 6",
+        "kind": "cron",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "main",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "systemEvent",
+        "text": "⏰ 板块成分股更新任务触发，执行脚本并推送结果"
+      },
+      "state": {}
+    },
+    {
+      "id": "caf8084f-3bd1-4e87-b167-b989144603d8",
+      "agentId": "main",
+      "name": "AI热点新闻",
+      "enabled": true,
+      "createdAtMs": 1772008500698,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "expr": "30 8 * * *",
+        "kind": "cron",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "AI热点新闻",
+        "command": "python3 /root/.openclaw/workspace/scripts/fetch_and_send_ai_news.py",
+        "timeout": 300,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {
+        "nextRunAtMs": 1772497800000,
+        "lastRunAtMs": 1772411400007,
+        "lastStatus": "ok",
+        "lastDurationMs": 185445,
+        "consecutiveErrors": 0,
+        "lastRunStatus": "ok",
+        "lastDeliveryStatus": "not-delivered",
+        "lastDelivered": false
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "d1922e13-9a67-47a6-8805-a91e972b4a00",
+      "agentId": "main",
+      "name": "交易截图提醒",
+      "enabled": true,
+      "createdAtMs": 1772008663035,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "expr": "0 19 * * 1-5",
+        "kind": "cron",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "agentTurn",
+        "text": "⏰ 交易截图提醒任务触发\n\n检查今天是否已向老二交易助手发送股票持仓交易图。\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n推送格式：\n⏰ 提醒：今天还未发送股票持仓交易图给老二交易助手，请及时发送。\n或\n✅ 今日交易截图已发送\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })"
+      },
+      "state": {
+        "nextRunAtMs": 1772449200000,
+        "lastRunAtMs": 1772190000003,
+        "lastStatus": "ok",
+        "lastDurationMs": 120047,
+        "consecutiveErrors": 0
+      },
+      "announce": true,
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      }
+    },
+    {
+      "id": "5828864e-88d4-4072-af89-03ae4d58cc87",
+      "name": "OpenClaw每日资讯",
+      "enabled": true,
+      "createdAtMs": 1772191193040,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 17 * * *"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "OpenClaw每日资讯",
+        "command": "python3 /root/.openclaw/workspace/scripts/fetch_openclaw_practices.py",
+        "timeout": 300,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {
+        "nextRunAtMs": 1772442000000,
+        "lastRunAtMs": 1772355600007,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 193628,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true,
+      "agentId": "main"
+    },
+    {
+      "id": "doctor-check-79000840",
+      "agentId": "main",
+      "name": "OpenClaw健康检查",
+      "enabled": true,
+      "createdAtMs": 1772279000840,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 9 * * 1",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行OpenClaw健康检查任务。\n\n执行步骤：\n1. 运行脚本：doctor_check.sh\n2. 检查系统状态\n3. 推送结果到飞书\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })\n\n注意：当前配置有问题，isolated job需要使用 agentTurn 而不是 exec"
+      },
+      "state": {
+        "nextRunAtMs": 1772419200000,
+        "consecutiveErrors": 0
+      }
+    },
+    {
+      "id": "gateway-restart-80488795",
+      "agentId": "main",
+      "name": "Gateway每周重启(带自我修复)",
+      "enabled": true,
+      "createdAtMs": 1772280488795,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 3 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行Gateway每周重启任务。\n\n执行步骤：\n1. 运行脚本：gateway_restart_with_recovery.sh\n2. 重启Gateway服务\n3. 检查服务状态\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })\n\n注意：当前配置有问题，isolated job需要使用 agentTurn 而不是 exec"
+      },
+      "state": {
+        "nextRunAtMs": 1772967600000,
+        "consecutiveErrors": 0
+      }
+    },
+    {
+      "id": "weekly-review-81752047",
+      "agentId": "main",
+      "name": "每周自动复盘",
+      "enabled": true,
+      "createdAtMs": 1772281752047,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "30 3 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行每周自动复盘任务。\n\n执行步骤：\n1. 运行脚本：weekly_review.sh\n2. 生成周复盘报告\n3. 推送到飞书\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })\n\n注意：当前配置有问题，isolated job需要使用 agentTurn 而不是 exec"
+      },
+      "state": {
+        "nextRunAtMs": 1772969400000,
+        "consecutiveErrors": 0
+      }
+    },
+    {
+      "id": "us-stock-morning-push-20260305",
+      "agentId": "main",
+      "name": "美股收盘推送",
+      "enabled": true,
+      "createdAtMs": 1772498940000,
+      "updatedAtMs": 1772498940000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "40 7 * * 2-6",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "美股收盘推送",
+        "command": "python3 /root/.openclaw/workspace/scripts/fetch_and_send_us_stock.py",
+        "timeout": 120,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {
+        "nextRunAtMs": null
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "dx-pipeline-workflow",
+      "agentId": "main",
+      "name": "短线情绪研判-工作流",
+      "enabled": false,
+      "createdAtMs": 1772500800000,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "20 16 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "agentTurn",
+        "text": "执行短线情绪研判工作流。\n\n执行步骤：\n1. 运行 master_pipeline.py\n2. 顺序执行：数据抓取 -> AI分析 -> 部署发布\n3. 每个子任务独立通知\n4. 任一失败停止并通知\n\n重要：发送消息必须使用 channel: feishu",
+        "timeoutSeconds": 900
+      },
+      "state": {
+        "nextRunAtMs": 1772512800000
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "stock-ma50-pipeline",
+      "agentId": "main",
+      "name": "个股数据+MA50工作流",
+      "enabled": false,
+      "createdAtMs": 1772500800000,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "5 16 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "agentTurn",
+        "text": "执行个股数据+MA50工作流。\n\n执行步骤：\n1. 运行 stock_ma50_pipeline.py\n2. 顺序执行：个股数据抓取 -> MA50计算\n3. 每个脚本保持原有通知方式\n4. 个股数据失败则停止\n\n重要：发送消息必须使用 channel: feishu",
+        "timeoutSeconds": 600
+      },
+      "state": {
+        "nextRunAtMs": 1772438700000
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "journal-2355-pipeline-4fedeb23",
+      "agentId": "main",
+      "name": "薄荷日记-23:55工作流",
+      "enabled": true,
+      "createdAtMs": 1770880800000,
+      "updatedAtMs": 1770880800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "55 23 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "薄荷日记工作流-23:55",
+        "command": "python3 /root/.openclaw/workspace/scripts/daily_journal_pipeline.py",
+        "timeout": 300,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {},
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "comprehensive-cleanup-2621664c",
+      "agentId": "main",
+      "name": "综合清理归档",
+      "enabled": true,
+      "createdAtMs": 1770880800000,
+      "updatedAtMs": 1770880800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "27 1 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "综合清理归档",
+        "command": "bash /root/.openclaw/workspace/scripts/comprehensive_cleanup.sh",
+        "timeout": 180,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {},
+      "delivery": {
+        "mode": "silent"
+      },
+      "announce": false
+    },
+    {
+      "id": "backup-core-config-3e5091ba",
+      "agentId": "main",
+      "name": "核心配置备份到GitHub",
+      "enabled": true,
+      "createdAtMs": 1770880800000,
+      "updatedAtMs": 1770880800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "22 2 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "核心配置备份",
+        "command": "bash /root/.openclaw/workspace/scripts/backup_core_config.sh",
+        "timeout": 300,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {},
+      "delivery": {
+        "mode": "silent"
+      },
+      "announce": false
+    },
+    {
+      "id": "backup-scripts-cf3a26d7",
+      "agentId": "main",
+      "name": "脚本备份到GitHub",
+      "enabled": true,
+      "createdAtMs": 1770880800000,
+      "updatedAtMs": 1770880800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "22 2 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "脚本备份",
+        "command": "bash /root/.openclaw/workspace/scripts/backup_scripts_to_github.sh",
+        "timeout": 300,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {},
+      "delivery": {
+        "mode": "silent"
+      },
+      "announce": false
+    },
+    {
+      "id": "etf-calc-daily-5a1a1332",
+      "agentId": "main",
+      "name": "ETF指标计算",
+      "enabled": true,
+      "createdAtMs": 1770880800000,
+      "updatedAtMs": 1770880800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "15 16 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "schedule",
+      "payload": {
+        "kind": "exec",
+        "description": "ETF指标计算",
+        "command": "python3 /root/.openclaw/workspace/projects/etf-indicators/scripts/batch_calc_etf.py",
+        "timeout": 600,
+        "workdir": "/root/.openclaw/workspace"
+      },
+      "state": {},
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    }
+  ]
+}

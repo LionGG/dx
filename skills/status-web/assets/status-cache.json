@@ -1,0 +1,205 @@
+{
+  "recent_work": [
+    {
+      "id": 1,
+      "title": "系统初始化",
+      "description": "小雨自评完成度：100%",
+      "timestamp": "2026-03-09T23:20:37.418Z",
+      "status": "completed",
+      "type": "development",
+      "completion": 100
+    }
+  ],
+  "scheduled_tasks": [
+    {
+      "name": "交易计划分析",
+      "schedule": "10 9 * * 1-5",
+      "next_run": "2026/3/10 09:10:00",
+      "last_run": "2026/3/9 09:10:00",
+      "status": "ok",
+      "duration": "50.0s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "AI热点新闻",
+      "schedule": "30 8 * * *",
+      "next_run": "2026/3/10 08:30:00",
+      "last_run": "2026/3/9 08:30:00",
+      "status": "ok",
+      "duration": "74.9s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "交易截图提醒",
+      "schedule": "0 19 * * 1-5",
+      "next_run": "2026/3/10 19:00:00",
+      "last_run": "2026/3/9 19:00:00",
+      "status": "ok",
+      "duration": "148.2s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "MA50占比计算",
+      "schedule": "10 16 * * 1-5",
+      "next_run": "2026/3/10 16:10:00",
+      "last_run": "2026/3/9 16:10:00",
+      "status": "ok",
+      "duration": "134.4s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "OpenClaw每日资讯",
+      "schedule": "0 17 * * *",
+      "next_run": "2026/3/10 17:00:00",
+      "last_run": "2026/3/9 17:00:00",
+      "status": "ok",
+      "duration": "142.5s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "量化交易每日资讯",
+      "schedule": "30 18 * * *",
+      "next_run": "2026/3/10 18:30:00",
+      "last_run": "2026/3/9 18:30:00",
+      "status": "ok",
+      "duration": "68.4s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "薄荷日记-写作",
+      "schedule": "50 23 * * *",
+      "next_run": "2026/3/10 23:50:00",
+      "last_run": "2026/3/9 23:50:00",
+      "status": "ok",
+      "duration": "199.6s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "薄荷日记-发送",
+      "schedule": "50 23 * * *",
+      "next_run": "2026/3/10 07:50:00",
+      "last_run": "2026/3/9 07:50:00",
+      "status": "ok",
+      "duration": "15.7s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "Gateway每周重启(带自我修复)",
+      "schedule": "0 3 * * 0",
+      "next_run": "2026/3/15 03:00:00",
+      "last_run": "never",
+      "status": "unknown",
+      "duration": "-",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "每周自动复盘",
+      "schedule": "30 3 * * 0",
+      "next_run": "2026/3/15 03:30:00",
+      "last_run": "2026/3/8 19:30:00",
+      "status": "ok",
+      "duration": "126.5s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "短线情绪-数据抓取",
+      "schedule": "20 16 * * 1-5",
+      "next_run": "2026/3/10 16:20:00",
+      "last_run": "2026/3/9 16:20:00",
+      "status": "ok",
+      "duration": "87.5s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "短线情绪-部署通知",
+      "schedule": "30 16 * * 1-5",
+      "next_run": "2026/3/10 16:30:00",
+      "last_run": "2026/3/9 16:30:00",
+      "status": "ok",
+      "duration": "120.2s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "每日文档清理",
+      "schedule": "15 3 * * *",
+      "next_run": "2026/3/11 03:15:00",
+      "last_run": "2026/3/10 03:15:00",
+      "status": "ok",
+      "duration": "308.0s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "每日状态报告-7:20",
+      "schedule": "20 7 * * *",
+      "next_run": "2026/3/10 07:20:00",
+      "last_run": "2026/3/9 07:20:00",
+      "status": "ok",
+      "duration": "21.4s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "OpenClaw健康检查",
+      "schedule": "0 4 * * 0",
+      "next_run": "2026/3/15 04:00:00",
+      "last_run": "2026/3/8 04:00:00",
+      "status": "ok",
+      "duration": "116.0s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "美股收盘推送-7:40",
+      "schedule": "40 7 * * *",
+      "next_run": "2026/3/10 07:40:00",
+      "last_run": "2026/3/9 07:40:00",
+      "status": "ok",
+      "duration": "52.3s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "短线情绪研判",
+      "schedule": "25 16 * * 1-5",
+      "next_run": "2026/3/10 16:25:00",
+      "last_run": "2026/3/9 16:25:00",
+      "status": "ok",
+      "duration": "118.7s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "ClawHub热门Skill搜索-22:00",
+      "schedule": "0 22 * * *",
+      "next_run": "2026/3/10 22:00:00",
+      "last_run": "2026/3/9 22:00:00",
+      "status": "ok",
+      "duration": "223.9s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "趋势分样本数据提醒-9:00",
+      "schedule": "0 9 * * *",
+      "next_run": "2026/3/10 09:00:00",
+      "last_run": "2026/3/9 09:00:00",
+      "status": "ok",
+      "duration": "17.7s",
+      "consecutive_errors": 0
+    },
+    {
+      "name": "ETF指标计算-16:15",
+      "schedule": "15 16 * * 1-5",
+      "next_run": "2026/3/10 16:15:00",
+      "last_run": "never",
+      "status": "unknown",
+      "duration": "-",
+      "consecutive_errors": 0
+    }
+  ],
+  "health_status": {
+    "status": "healthy",
+    "uptime": "9 天 17 小时 20 分钟",
+    "cpu_load": "22.5%",
+    "memory_available": "2.36 GB",
+    "openclaw_connected": true,
+    "model_status": "k2p5",
+    "last_check": "2026-03-09T23:20:47.287Z"
+  },
+  "last_updated": "2026-03-10T07:20:47.289688"
+}

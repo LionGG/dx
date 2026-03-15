@@ -1,0 +1,48 @@
+========================================
+[Fri Mar 13 09:18:53 AM CST 2026] 核心配置备份开始
+[Fri Mar 13 09:18:53 AM CST 2026] ❌ 错误: 未找到GitHub Token
+========================================
+[Fri Mar 13 09:20:48 AM CST 2026] 核心配置备份开始
+[Fri Mar 13 09:20:48 AM CST 2026] 错误: 未找到GitHub Token
+========================================
+[Fri Mar 13 09:21:40 AM CST 2026] 核心配置备份开始
+[Fri Mar 13 09:21:40 AM CST 2026] 正在克隆仓库...
+Cloning into '/tmp/openclaw-backup-core'...
+[Fri Mar 13 09:21:42 AM CST 2026] 复制核心配置文件...
+[Fri Mar 13 09:21:42 AM CST 2026] 没有变更需要提交
+[Fri Mar 13 09:21:42 AM CST 2026] 备份流程结束
+========================================
+========================================
+[Fri Mar 13 09:28:54 AM CST 2026] 核心配置备份开始
+[Fri Mar 13 09:28:54 AM CST 2026] 正在克隆仓库(SSH)...
+Cloning into '/tmp/openclaw-backup-core'...
+fatal: could not read Username for 'https://github.com': No such device or address
+[Fri Mar 13 09:28:56 AM CST 2026] 克隆仓库失败
+========================================
+[Fri Mar 13 09:36:23 AM CST 2026] 核心配置备份开始
+[Fri Mar 13 09:36:23 AM CST 2026] 正在克隆仓库...
+Cloning into '/tmp/openclaw-backup-core'...
+[Fri Mar 13 09:36:28 AM CST 2026] 复制核心配置文件...
+[Fri Mar 13 09:36:28 AM CST 2026] 没有变更需要提交
+[Fri Mar 13 09:36:28 AM CST 2026] 备份流程结束
+========================================
+========================================
+[Sat Mar 14 10:48:11 AM CST 2026] 核心配置备份开始
+[Sat Mar 14 10:48:11 AM CST 2026] 正在克隆仓库...
+Cloning into '/tmp/openclaw-backup-core'...
+[Sat Mar 14 10:48:20 AM CST 2026] 复制核心配置文件...
+To github.com:LionGG/claw.git
+   6455f2f..dd7b4bd  main -> main
+[Sat Mar 14 10:48:25 AM CST 2026] 核心配置备份完成并推送到GitHub
+[Sat Mar 14 10:48:25 AM CST 2026] 备份流程结束
+========================================
+========================================
+[Sun Mar 15 11:30:16 AM CST 2026] 核心配置备份开始
+[Sun Mar 15 11:30:16 AM CST 2026] 正在克隆仓库...
+Cloning into '/tmp/openclaw-backup-core'...
+[Sun Mar 15 11:30:27 AM CST 2026] 复制核心配置文件...
+To github.com:LionGG/claw.git
+   dfe7ce8..3614de6  main -> main
+[Sun Mar 15 11:30:31 AM CST 2026] 核心配置备份完成并推送到GitHub
+[Sun Mar 15 11:30:31 AM CST 2026] 备份流程结束
+========================================

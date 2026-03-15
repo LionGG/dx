@@ -7,7 +7,7 @@
     },
     "self-improving-agent": {
       "version": "1.0.11",
-      "installedAt": 1772630114544
+      "installedAt": 1772724332075
     },
     "memory-setup": {
       "version": "1.0.0",
@@ -16,6 +16,82 @@
     "automation-workflows": {
       "version": "0.1.0",
       "installedAt": 1772630149254
+    },
+    "browse": {
+      "version": "2.0.2",
+      "installedAt": 1772729418651
+    },
+    "desearch-web-search": {
+      "version": "1.0.1",
+      "installedAt": 1772729920485
+    },
+    "ai-web-automation": {
+      "version": "1.0.0",
+      "installedAt": 1772730242804
+    },
+    "web-pilot": {
+      "version": "1.0.0",
+      "installedAt": 1772730251918
+    },
+    "web": {
+      "version": "1.0.0",
+      "installedAt": 1772730258244
+    },
+    "web-claude": {
+      "version": "1.1.0",
+      "installedAt": 1772730263092
+    },
+    "mupeng-web-claude": {
+      "version": "1.0.0",
+      "installedAt": 1772730268100
+    },
+    "status-web": {
+      "version": "1.0.0",
+      "installedAt": 1772730276130
+    },
+    "summarize": {
+      "version": "1.0.0",
+      "installedAt": 1773154232613
+    },
+    "feishu-bitable": {
+      "version": "1.0.0",
+      "installedAt": 1773190735968
+    },
+    "feishu-leave-request": {
+      "version": "1.0.1",
+      "installedAt": 1773190742905
+    },
+    "feishu-messaging": {
+      "version": "0.0.3",
+      "installedAt": 1773190748960
+    },
+    "feishu-memory-recall": {
+      "version": "2.0.0",
+      "installedAt": 1773190763417
+    },
+    "feishu-sheets-skill": {
+      "version": "1.0.0",
+      "installedAt": 1773190763707
+    },
+    "skill-feishu-manager": {
+      "version": "1.0.1",
+      "installedAt": 1773190796790
+    },
+    "feishu-file-sender": {
+      "version": "1.0.9",
+      "installedAt": 1773190816457
+    },
+    "feishu-drive": {
+      "version": "1.0.0",
+      "installedAt": 1773192510931
+    },
+    "feishu-wiki": {
+      "version": "1.0.0",
+      "installedAt": 1773192581617
+    },
+    "lark-card-sender": {
+      "version": "1.0.0",
+      "installedAt": 1773326551960
     }
   }
 }

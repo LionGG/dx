@@ -11,6 +11,26 @@ import os
 # 飞书群机器人 Webhook
 GROUP_WEBHOOK = "https://open.feishu.cn/open-apis/bot/v2/hook/c21f215d-e186-4b3b-bb50-1ebbe4e994df"
 
+# 加载飞书应用配置（从secrets）
+def _load_feishu_config():
+    """从secrets加载飞书应用配置"""
+    secrets_path = os.path.expanduser("~/.openclaw/secrets/secrets.json")
+    try:
+        with open(secrets_path, 'r') as f:
+            secrets = json.load(f)
+        
+        for secret in secrets.get('secrets', []):
+            if secret.get('name') == 'feishu-app':
+                entries = {entry['key']: entry['value'] for entry in secret.get('entries', [])}
+                return entries.get('app_id'), entries.get('app_secret')
+    except Exception as e:
+        print(f"⚠️ 加载飞书配置失败: {e}")
+    
+    return None, None
+
+# 全局加载一次
+FEISHU_APP_ID, FEISHU_APP_SECRET = _load_feishu_config()
+
 def send_to_feishu_group(text, image_path=None):
     """发送消息到飞书群
     
@@ -50,11 +70,16 @@ def send_to_feishu_group(text, image_path=None):
 def upload_image(image_path):
     """上传图片到飞书，获取image_key"""
     try:
+        # 检查配置是否加载成功
+        if not FEISHU_APP_ID or not FEISHU_APP_SECRET:
+            print("❌ 飞书应用配置未加载，无法上传图片")
+            return None
+        
         # 获取tenant_access_token
         token_url = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal"
         token_data = {
-            "app_id": "cli_a91e22f1e138dbef",
-            "app_secret": "AFttWLYp3oprJnfB4gFoHdDMKasA04Nn"
+            "app_id": FEISHU_APP_ID,
+            "app_secret": FEISHU_APP_SECRET
         }
         resp = requests.post(token_url, json=token_data, timeout=10)
         token_result = resp.json()

@@ -1,98 +1,51 @@
 #!/usr/bin/env python3
 """
 发布到墨问模块
-优化 markdown 格式转换为墨问 doc 格式
+读取传入的 markdown 文件并发布
 """
 
 import requests
 import json
+import sqlite3
+import sys
+import re
 
 def markdown_to_mowen_doc(markdown_text):
-    """Convert markdown to Mowen doc format - 最终优化版"""
+    """Convert markdown to Mowen doc format"""
     lines = markdown_text.split('\n')
     content = []
     
-    for i, line in enumerate(lines):
+    for line in lines:
         s = line.strip()
-        if not s:
+        if not s or s == '---':
             continue
         
-        # 跳过分割线 ---
-        if s == '---' or s.startswith('---'):
-            continue
-        
-        # 一级标题 - 不加空行，去掉#，去掉**，但要加粗
         if s.startswith('# '):
             title_text = s[2:].replace('**', '')
             content.append({
                 "type": "paragraph",
-                "content": [{
-                    "type": "text",
-                    "text": title_text,
-                    "marks": [{"type": "bold"}]
-                }]
+                "content": [{"type": "text", "text": title_text, "marks": [{"type": "bold"}]}]
             })
-        # 二级标题 - 前面加空行，去掉##，去掉**
         elif s.startswith('## '):
             title_text = s[3:].replace('**', '')
-            content.append({"type": "paragraph", "content": []})  # 前面加空行
-            content.append({
-                "type": "paragraph",
-                "content": [{"type": "text", "text": title_text}]
-            })
-        # 三级标题 - 前面加空行，去掉###，去掉**
-        elif s.startswith('### '):
-            title_text = s[4:].replace('**', '')
-            content.append({"type": "paragraph", "content": []})  # 前面加空行
-            content.append({
-                "type": "paragraph",
-                "content": [{"type": "text", "text": title_text}]
-            })
-        # 四级标题 - 前面加空行，去掉####，去掉**
-        elif s.startswith('#### '):
-            title_text = s[5:].replace('**', '')
-            content.append({"type": "paragraph", "content": []})  # 前面加空行
-            content.append({
-                "type": "paragraph",
-                "content": [{"type": "text", "text": title_text}]
-            })
-        # 列表项 - 去掉**
+            content.append({"type": "paragraph", "content": []})
+            content.append({"type": "paragraph", "content": [{"type": "text", "text": title_text}]})
         elif s.startswith('- '):
             text = s[2:].replace('**', '')
-            content.append({
-                "type": "paragraph",
-                "content": [{"type": "text", "text": "• " + text}]
-            })
-        # 普通段落 - 去掉**
+            content.append({"type": "paragraph", "content": [{"type": "text", "text": "• " + text}]})
         else:
             text = s.replace('**', '')
-            content.append({
-                "type": "paragraph",
-                "content": [{"type": "text", "text": text}]
-            })
+            content.append({"type": "paragraph", "content": [{"type": "text", "text": text}]})
     
     return content
 
-def publish_to_mowen(title, content, tags=None, auto_publish=True):
-    """
-    发布 markdown 内容到墨问
-    
-    Args:
-        title: 笔记标题
-        content: Markdown 内容
-        tags: 标签列表（默认: ["分析报告"]）
-        auto_publish: 是否公开（默认: True）
-    
-    Returns:
-        dict: {"success": bool, "note_id": str, "url": str, "error": str}
-    """
+def publish_to_mowen(title, content, tags=None):
+    """发布到墨问"""
     if tags is None:
         tags = ["分析报告"]
     
-    # 转换 markdown 为墨问 doc 格式
     doc_content = markdown_to_mowen_doc(content)
     
-    # 调用墨问 API
     url = "https://open.mowen.cn/api/open/api/v1/note/create"
     headers = {
         "Authorization": "Bearer ijbrCOAwgLnp9Vu5kdZhw59hUfX72ba8",
@@ -100,14 +53,8 @@ def publish_to_mowen(title, content, tags=None, auto_publish=True):
     }
     
     payload = {
-        "body": {
-            "type": "doc",
-            "content": doc_content
-        },
-        "settings": {
-            "autoPublish": auto_publish,
-            "tags": tags
-        }
+        "body": {"type": "doc", "content": doc_content},
+        "settings": {"autoPublish": True, "tags": tags}
     }
     
     try:
@@ -116,18 +63,55 @@ def publish_to_mowen(title, content, tags=None, auto_publish=True):
         
         if result.get('code') == 200 or 'noteId' in result:
             note_id = result.get('noteId') or result.get('data', {}).get('note', {}).get('id')
-            return {
-                "success": True,
-                "note_id": note_id,
-                "url": f"https://note.mowen.cn/detail/{note_id}"
-            }
+            return {"success": True, "note_id": note_id, "url": f"https://note.mowen.cn/detail/{note_id}"}
         else:
-            return {
-                "success": False,
-                "error": result.get('message', 'Unknown error')
-            }
+            return {"success": False, "error": result.get('message', 'Unknown error')}
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e)
-        }
+        return {"success": False, "error": str(e)}
+
+def main():
+    """主函数 - 使用传入的 markdown 文件"""
+    
+    if len(sys.argv) < 2:
+        print("❌ 请提供 markdown 文件路径")
+        print("用法: python3 publish_to_mowen.py <report.md>")
+        sys.exit(1)
+    
+    report_file = sys.argv[1]
+    
+    # 读取传入的报告文件
+    with open(report_file, 'r', encoding='utf-8') as f:
+        markdown_content = f.read()
+    
+    # 提取标题（第一行）
+    title = "A股短线情绪研判"
+    first_line = markdown_content.split('\n')[0]
+    if first_line.startswith('# '):
+        title = first_line[2:].strip()
+    
+    print(f"✅ 读取报告: {report_file}")
+    print(f"✅ 标题: {title}")
+    
+    # 发布到墨问
+    result = publish_to_mowen(title=title, content=markdown_content, tags=["短线情绪", "A股分析"])
+    
+    if result['success']:
+        print(f"✅ 发布成功")
+        print(f"   链接: {result['url']}")
+        
+        # 保存链接到数据库
+        conn = sqlite3.connect('/root/.openclaw/workspace/stock/dx/data/duanxian.db')
+        cursor = conn.cursor()
+        # 从标题中提取日期
+        date_match = re.search(r'(\d{4}-\d{2}-\d{2})', title)
+        if date_match:
+            report_date = date_match.group(1)
+            cursor.execute("UPDATE market_sentiment SET mowen_url = ? WHERE date = ?", (result['url'], report_date))
+            conn.commit()
+            print(f"✅ 链接已保存到数据库 ({report_date})")
+        conn.close()
+    else:
+        print(f"❌ 发布失败: {result['error']}")
+
+if __name__ == "__main__":
+    main()

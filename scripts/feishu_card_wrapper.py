@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+"""
+飞书卡片消息封装器
+统一调用 lark-card-sender 发送各类卡片消息
+"""
+
+import os
+import sys
+import json
+
+# 添加技能路径
+sys.path.insert(0, '/root/.openclaw/workspace/skills/lark-card-sender')
+
+# 加载配置
+def load_secrets():
+    """从 secrets.json 加载飞书配置"""
+    with open('/root/.openclaw/secrets/secrets.json', 'r') as f:
+        secrets = json.load(f)
+        for secret in secrets['secrets']:
+            if secret['name'] == 'feishu-app':
+                for entry in secret['entries']:
+                    if entry['key'] == 'app_id':
+                        os.environ['FEISHU_APP_ID'] = entry['value']
+                    elif entry['key'] == 'app_secret':
+                        os.environ['FEISHU_APP_SECRET'] = entry['value']
+                break
+
+load_secrets()
+
+from feishu_card_sender_advanced import AdvancedFeishuCardSender
+
+# 宝总的 Open ID
+BAOZONG_OPEN_ID = "ou_7b3b64c0a18c735401f4e1d172d4c802"
+
+class FeishuCardWrapper:
+    """飞书卡片消息封装器"""
+    
+    def __init__(self):
+        self.sender = AdvancedFeishuCardSender()
+    
+    def send_journal_card(self, date, sections):
+        """发送日记卡片"""
+        content_lines = [f"**{date} 薄荷日记**\n"]
+        for section in sections:
+            content_lines.append(f"\n**{section['title']}**")
+            content_lines.append(section['content'])
+        
+        return self.sender.send_simple_card(
+            receive_id=BAOZONG_OPEN_ID,
+            receive_id_type='open_id',
+            title=f'📔 {date} 薄荷日记',
+            content='\n'.join(content_lines)
+        )
+    
+    def send_us_stock_card(self, date, indices, highlights):
+        """发送美股收盘卡片"""
+        content_lines = [f"**{date} 美股收盘摘要**\n"]
+        content_lines.append("**主要指数：**")
+        for idx in indices:
+            emoji = "📈" if idx['change'] > 0 else "📉"
+            content_lines.append(f"{emoji} {idx['name']}: {idx['value']} ({idx['change']:+.2f}%)")
+        
+        if highlights:
+            content_lines.append("\n**重点关注：**")
+            for hl in highlights:
+                content_lines.append(f"• {hl}")
+        
+        return self.sender.send_simple_card(
+            receive_id=BAOZONG_OPEN_ID,
+            receive_id_type='open_id',
+            title=f'🌙 {date} 美股收盘',
+            content='\n'.join(content_lines)
+        )
+    
+    def send_ai_news_card(self, date, news_items):
+        """发送AI热点新闻卡片"""
+        return self.sender.send_news_card(
+            receive_id=BAOZONG_OPEN_ID,
+            receive_id_type='open_id',
+            news_items=[{
+                'category': item.get('category', '💡'),
+                'title': item['title'],
+                'source': item.get('source', 'AI资讯'),
+                'time': item.get('time', '刚刚')
+            } for item in news_items]
+        )
+    
+    def send_task_status_card(self, task_name, status, details):
+        """发送任务状态卡片"""
+        emoji = '✅' if status == 'success' else '❌' if status == 'failed' else '⏳'
+        
+        return self.sender.send_simple_card(
+            receive_id=BAOZONG_OPEN_ID,
+            receive_id_type='open_id',
+            title=f'{emoji} {task_name}',
+            content=f"**状态：** {status.upper()}\n\n{details}"
+        )
+    
+    def send_system_alert_card(self, alert_type, message, severity='warning'):
+        """发送系统告警卡片"""
+        emoji_map = {'critical': '🚨', 'warning': '⚠️', 'info': 'ℹ️'}
+        
+        return self.sender.send_simple_card(
+            receive_id=BAOZONG_OPEN_ID,
+            receive_id_type='open_id',
+            title=f"{emoji_map.get(severity, '⚠️')} 系统{alert_type}",
+            content=message
+        )
+    
+    def send_simple_card(self, receive_id, receive_id_type, title, content, template='blue'):
+        """发送简单卡片（兼容trading_plan_analysis等脚本）"""
+        return self.sender.send_simple_card(
+            receive_id=receive_id,
+            receive_id_type=receive_id_type,
+            title=title,
+            content=content,
+            template=template
+        )
+
+if __name__ == '__main__':
+    # 测试
+    wrapper = FeishuCardWrapper()
+    print("飞书卡片封装器初始化成功")
+    
+    # 测试发送
+    result = wrapper.send_simple_card(
+        receive_id=BAOZONG_OPEN_ID,
+        receive_id_type='open_id',
+        title='🧪 恢复测试',
+        content='**feishu_card_wrapper 已恢复**\n使用直接API调用方式',
+        template='green'
+    )
+    print(f"发送结果: {result}")

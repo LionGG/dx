@@ -4,7 +4,7 @@
     {
       "id": "86f91572-7f40-4da3-9676-0d18709c5064",
       "agentId": "main",
-      "name": "\u4ea4\u6613\u8ba1\u5212\u5206\u6790",
+      "name": "交易计划分析",
       "enabled": true,
       "createdAtMs": 1771864435979,
       "updatedAtMs": 1772500800000,
@@ -17,7 +17,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "text": "\u23f0 \u4ea4\u6613\u8ba1\u5212\u5206\u6790\u4efb\u52a1\u89e6\u53d1\n\n\u6574\u7406\u4eca\u65e5\u4ea4\u6613\u8ba1\u5212\u5e76\u5206\u6790\uff0c\u7ed9\u51fa\u6539\u8fdb\u5efa\u8bae\u3002\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u63a8\u9001\u683c\u5f0f\uff1a\n\u2705 \u4ea4\u6613\u8ba1\u5212\u5206\u6790\u6267\u884c\u6210\u529f - \u65e5\u671f\n\u6216\n\u274c \u4ea4\u6613\u8ba1\u5212\u5206\u6790\u6267\u884c\u5931\u8d25 - \u65e5\u671f\n\u539f\u56e0\uff1a\u9519\u8bef\u4fe1\u606f\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })"
+        "text": "⏰ 交易计划分析任务触发\n\n整理今日交易计划并分析，给出改进建议。\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n推送格式：\n✅ 交易计划分析执行成功 - 日期\n或\n❌ 交易计划分析执行失败 - 日期\n原因：错误信息\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })"
       },
       "state": {
         "nextRunAtMs": 1772500200000,
@@ -35,161 +35,9 @@
       }
     },
     {
-      "id": "1367970b-9592-45a4-bbdd-f0474aac3153",
-      "agentId": "main",
-      "name": "\u4e2a\u80a1\u6570\u636e\u6293\u53d6",
-      "enabled": true,
-      "createdAtMs": 1772008000398,
-      "updatedAtMs": 1772500800000,
-      "schedule": {
-        "expr": "5 16 * * 1-5",
-        "kind": "cron",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "main",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "systemEvent",
-        "message": "\u6267\u884c\u4e2a\u80a1\u6570\u636e\u540c\u6b65\u4efb\u52a1\uff1a\u4eceMySQL\u540c\u6b65\u5f53\u65e5\u4e2a\u80a1\u6570\u636e\u5230SQLite\u6570\u636e\u5e93\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8fd0\u884c\u811a\u672c\uff1async_stock_from_mysql_v2.py\n2. \u68c0\u67e5\u540c\u6b65\u7ed3\u679c\n3. \u63a8\u9001\u7ed3\u679c\u5230\u98de\u4e66\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u6ce8\u610f\uff1a\u5982\u679c\u4eca\u65e5\u6570\u636e\u5df2\u5b58\u5728\u5219\u8df3\u8fc7\u3002\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })",
-        "timeoutSeconds": 300
-      },
-      "state": {
-        "nextRunAtMs": 1772438700000,
-        "lastRunAtMs": 1772181229817,
-        "lastStatus": "ok",
-        "lastDurationMs": 120263,
-        "consecutiveErrors": 0
-      },
-      "delivery": {
-        "mode": "announce",
-        "channel": "feishu"
-      },
-      "announce": true
-    },
-    {
-      "id": "948d1a56-8d93-4a0c-a396-fca7b7cdd802",
-      "agentId": "main",
-      "name": "\u6307\u6570\u6570\u636e\u6293\u53d6",
-      "enabled": false,
-      "createdAtMs": 1772008000410,
-      "updatedAtMs": 1772097282767,
-      "schedule": {
-        "expr": "15 16 * * 1-5",
-        "kind": "cron",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "main",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "systemEvent",
-        "text": "\u23f0 \u6307\u6570\u6570\u636e\u6293\u53d6\u4efb\u52a1\u89e6\u53d1\uff0c\u6267\u884c\u811a\u672c\u5e76\u63a8\u9001\u7ed3\u679c"
-      },
-      "state": {
-        "lastRunAtMs": 1772092500003,
-        "lastStatus": "ok",
-        "lastDurationMs": 275102,
-        "consecutiveErrors": 0
-      }
-    },
-    {
-      "id": "3ca33862-7c30-4da5-bdde-0d48d0f38ad8",
-      "agentId": "main",
-      "name": "\u677f\u5757\u6570\u636e\u6293\u53d6",
-      "enabled": false,
-      "createdAtMs": 1772008000421,
-      "updatedAtMs": 1772180494600,
-      "schedule": {
-        "expr": "11 16 * * 1-5",
-        "kind": "cron",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "main",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "systemEvent",
-        "text": "\u23f0 \u677f\u5757\u6570\u636e\u6293\u53d6\u4efb\u52a1\u89e6\u53d1\uff0c\u6267\u884c\u811a\u672c\u5e76\u63a8\u9001\u7ed3\u679c"
-      },
-      "state": {
-        "lastRunAtMs": 1772093460003,
-        "lastStatus": "ok",
-        "lastDurationMs": 271336,
-        "consecutiveErrors": 0
-      }
-    },
-    {
-      "id": "368d71e9-7c35-46c5-b522-5af68d9397b9",
-      "agentId": "main",
-      "name": "\u6da8\u505c\u6c60\u6293\u53d6",
-      "enabled": false,
-      "createdAtMs": 1772008028232,
-      "updatedAtMs": 1772180494620,
-      "schedule": {
-        "expr": "20 16 * * 1-5",
-        "kind": "cron",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "main",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "systemEvent",
-        "text": "\u23f0 \u6da8\u505c\u6c60\u6293\u53d6\u4efb\u52a1\u89e6\u53d1\uff0c\u6267\u884c\u811a\u672c\u5e76\u63a8\u9001\u7ed3\u679c"
-      },
-      "state": {
-        "lastRunAtMs": 1772094000004,
-        "lastStatus": "ok",
-        "lastDurationMs": 98614,
-        "consecutiveErrors": 0
-      }
-    },
-    {
-      "id": "2ecf2b28-6c4e-4668-bf42-cb6d9950215e",
-      "agentId": "main",
-      "name": "\u9f99\u864e\u699c\u8d44\u91d1\u6d41\u5411",
-      "enabled": false,
-      "createdAtMs": 1772008028244,
-      "updatedAtMs": 1772180494647,
-      "schedule": {
-        "expr": "50 17 * * 1-5",
-        "kind": "cron",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "main",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "systemEvent",
-        "text": "\u23f0 \u9f99\u864e\u699c\u8d44\u91d1\u6d41\u5411\u4efb\u52a1\u89e6\u53d1\uff0c\u6267\u884c\u811a\u672c\u5e76\u63a8\u9001\u7ed3\u679c"
-      },
-      "state": {
-        "lastRunAtMs": 1772013000004,
-        "lastStatus": "ok",
-        "lastDurationMs": 72288,
-        "consecutiveErrors": 0
-      }
-    },
-    {
-      "id": "cb2d643a-d37e-4558-b5d4-61aea0df3212",
-      "agentId": "main",
-      "name": "\u677f\u5757\u6210\u5206\u80a1\u66f4\u65b0",
-      "enabled": false,
-      "createdAtMs": 1772008028256,
-      "updatedAtMs": 1772180494666,
-      "schedule": {
-        "expr": "0 2 * * 6",
-        "kind": "cron",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "main",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "systemEvent",
-        "text": "\u23f0 \u677f\u5757\u6210\u5206\u80a1\u66f4\u65b0\u4efb\u52a1\u89e6\u53d1\uff0c\u6267\u884c\u811a\u672c\u5e76\u63a8\u9001\u7ed3\u679c"
-      },
-      "state": {}
-    },
-    {
       "id": "caf8084f-3bd1-4e87-b167-b989144603d8",
       "agentId": "main",
-      "name": "AI\u70ed\u70b9\u65b0\u95fb",
+      "name": "AI热点新闻",
       "enabled": true,
       "createdAtMs": 1772008500698,
       "updatedAtMs": 1772500800000,
@@ -202,7 +50,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "message": "\u641c\u7d22\u5e76\u6574\u7406\u5f53\u5929\u6700\u65b0\u7684AI\u70ed\u70b9\u65b0\u95fb\uff0c\u751f\u62103-5\u6761\u91cd\u8981\u52a8\u6001\u7684\u7b80\u62a5\u3002\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u63a8\u9001\u683c\u5f0f\uff1a\n\u2705 AI\u70ed\u70b9\u65b0\u95fb\u6267\u884c\u6210\u529f - \u65e5\u671f\n\u6216\n\u274c AI\u70ed\u70b9\u65b0\u95fb\u6267\u884c\u5931\u8d25 - \u65e5\u671f\n\u539f\u56e0\uff1a\u9519\u8bef\u4fe1\u606f\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })",
+        "message": "执行AI热点新闻任务。运行脚本: python3 /root/.openclaw/workspace/scripts/fetch_and_send_ai_news.py",
         "timeoutSeconds": 300
       },
       "state": {
@@ -224,7 +72,7 @@
     {
       "id": "d1922e13-9a67-47a6-8805-a91e972b4a00",
       "agentId": "main",
-      "name": "\u4ea4\u6613\u622a\u56fe\u63d0\u9192",
+      "name": "交易截图提醒",
       "enabled": true,
       "createdAtMs": 1772008663035,
       "updatedAtMs": 1772500800000,
@@ -237,7 +85,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "text": "\u23f0 \u4ea4\u6613\u622a\u56fe\u63d0\u9192\u4efb\u52a1\u89e6\u53d1\n\n\u68c0\u67e5\u4eca\u5929\u662f\u5426\u5df2\u5411\u8001\u4e8c\u4ea4\u6613\u52a9\u624b\u53d1\u9001\u80a1\u7968\u6301\u4ed3\u4ea4\u6613\u56fe\u3002\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u63a8\u9001\u683c\u5f0f\uff1a\n\u23f0 \u63d0\u9192\uff1a\u4eca\u5929\u8fd8\u672a\u53d1\u9001\u80a1\u7968\u6301\u4ed3\u4ea4\u6613\u56fe\u7ed9\u8001\u4e8c\u4ea4\u6613\u52a9\u624b\uff0c\u8bf7\u53ca\u65f6\u53d1\u9001\u3002\n\u6216\n\u2705 \u4eca\u65e5\u4ea4\u6613\u622a\u56fe\u5df2\u53d1\u9001\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })"
+        "text": "⏰ 交易截图提醒任务触发\n\n检查今天是否已向老二交易助手发送股票持仓交易图。\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n推送格式：\n⏰ 提醒：今天还未发送股票持仓交易图给老二交易助手，请及时发送。\n或\n✅ 今日交易截图已发送\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })"
       },
       "state": {
         "nextRunAtMs": 1772449200000,
@@ -253,40 +101,8 @@
       }
     },
     {
-      "id": "524774a8-9505-46c1-aabb-2b1bd9357155",
-      "agentId": "main",
-      "name": "MA50\u5360\u6bd4\u8ba1\u7b97",
-      "enabled": true,
-      "createdAtMs": 1772090248883,
-      "updatedAtMs": 1772500800000,
-      "schedule": {
-        "expr": "10 16 * * 1-5",
-        "kind": "cron",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "main",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "systemEvent",
-        "message": "\u6267\u884cMA50\u5360\u6bd4\u8ba1\u7b97\u4efb\u52a1\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8fd0\u884c\u811a\u672c\uff1acalculate_ma50_ratio.py\n2. \u751f\u6210MA50\u5360\u6bd4\u8d8b\u52bf\u56fe\n3. \u63a8\u9001\u6587\u5b57+\u56fe\u7247\u5230\u98de\u4e66\u7fa4\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u8f93\u51fa\u683c\u5f0f\uff1a\n- \u4eca\u65e5MA50\u5360\u6bd4\uff1aXX%\n- \u8f83\u6628\u65e5\u53d8\u5316\uff1a+/- X%\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })",
-        "timeoutSeconds": 300
-      },
-      "state": {
-        "nextRunAtMs": 1772439000000,
-        "lastRunAtMs": 1772179800003,
-        "lastStatus": "ok",
-        "lastDurationMs": 261400,
-        "consecutiveErrors": 0
-      },
-      "delivery": {
-        "mode": "announce",
-        "channel": "feishu"
-      },
-      "announce": true
-    },
-    {
       "id": "5828864e-88d4-4072-af89-03ae4d58cc87",
-      "name": "OpenClaw\u6bcf\u65e5\u8d44\u8baf",
+      "name": "OpenClaw每日资讯",
       "enabled": true,
       "createdAtMs": 1772191193040,
       "updatedAtMs": 1772500800000,
@@ -298,7 +114,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "message": "\u6574\u7406OpenClaw\u76f8\u5173\u6bcf\u65e5\u8d44\u8baf\u3002\n\n\u5185\u5bb9\u5305\u62ec\uff1a\n1. OpenClaw\u66f4\u65b0\u52a8\u6001\n2. \u65b0\u529f\u80fd\u4ecb\u7ecd\n3. \u4f7f\u7528\u6280\u5de7\n4. \u793e\u533a\u52a8\u6001\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u63a8\u9001\u683c\u5f0f\uff1a\n\u2705 OpenClaw\u6bcf\u65e5\u8d44\u8baf - \u65e5\u671f\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })",
+        "message": "整理OpenClaw相关每日资讯。\n\n内容包括：\n1. OpenClaw更新动态\n2. 新功能介绍\n3. 使用技巧\n4. 社区动态\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n推送格式：\n✅ OpenClaw每日资讯 - 日期\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })",
         "timeoutSeconds": 300
       },
       "state": {
@@ -319,44 +135,9 @@
       "agentId": "main"
     },
     {
-      "id": "quant-news-daily",
-      "agentId": "main",
-      "name": "\u91cf\u5316\u4ea4\u6613\u6bcf\u65e5\u8d44\u8baf",
-      "enabled": true,
-      "createdAtMs": 1772191226612,
-      "updatedAtMs": 1772500800000,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 12 * * *",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "main",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "systemEvent",
-        "text": "\u6267\u884c\u91cf\u5316\u4ea4\u6613\u6bcf\u65e5\u8d44\u8baf\u4efb\u52a1\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8fd0\u884c\u811a\u672c\uff1a/root/.openclaw/workspace/stock/a-share-warehouse/scripts/generate_quant_news.py\n2. \u83b7\u53d6\u91cf\u5316\u884c\u4e1a\u52a8\u6001\u3001\u6280\u672f\u6280\u5de7\u3001\u7b56\u7565\u524d\u6cbf\u3001\u5de5\u5177\u8d44\u6e90\n3. \u63a8\u9001\u5230\u5b9d\u603b\u4e2a\u4eba\uff08\u4e0d\u8981\u53d1\u7fa4\uff09\n\n\u91cd\u8981\uff1a\n- \u53ea\u5305\u542b\u91cf\u5316\u65b0\u95fb\u548c\u6280\u672f\u6280\u5de7\n- \u4e0d\u5305\u542b\u5e02\u573a\u6570\u636e\u3001\u7b56\u7565\u8868\u73b0\u3001\u4e70\u5356\u5efa\u8bae\n- \u53d1\u9001\u7ed9\u4e2a\u4eba\uff0c\u4e0d\u662f\u7fa4\n- \u4f7f\u7528 channel: feishu \u53c2\u6570",
-        "timeoutSeconds": 300
-      },
-      "state": {
-        "nextRunAtMs": 1772424000000,
-        "lastRunAtMs": 1772337600006,
-        "lastRunStatus": "ok",
-        "lastStatus": "ok",
-        "lastDurationMs": 270025,
-        "lastDelivered": true,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 0
-      },
-      "delivery": {
-        "mode": "announce",
-        "channel": "feishu"
-      },
-      "announce": true
-    },
-    {
       "id": "journal-write-46967779",
       "agentId": "main",
-      "name": "\u8584\u8377\u65e5\u8bb0-\u5199\u4f5c",
+      "name": "薄荷日记-写作",
       "enabled": true,
       "createdAtMs": 1772246967779,
       "updatedAtMs": 1772500800000,
@@ -369,7 +150,8 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "message": "\u6267\u884c\u8584\u8377\u65e5\u8bb0\u5199\u4f5c\u4efb\u52a1\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8fd0\u884c\u811a\u672c\uff1awrite_daily_journal.py\n2. \u751f\u6210\u65e5\u8bb0\u5185\u5bb9\n3. \u4fdd\u5b58\u5230memory\u76ee\u5f55\n\n\u91cd\u8981\uff1a\n- \u6b64\u4efb\u52a1\u9700\u8981\u4f7f\u7528 exec \u5de5\u5177\u6267\u884cPython\u811a\u672c\n- \u5982\u679c\u811a\u672c\u6267\u884c\u5931\u8d25\uff0c\u8bb0\u5f55\u9519\u8bef\u4fe1\u606f\n\n\u6ce8\u610f\uff1a\u5f53\u524d\u914d\u7f6e\u6709\u95ee\u9898\uff0cisolated job\u9700\u8981\u4f7f\u7528 agentTurn \u800c\u4e0d\u662f exec"
+        "message": "执行日记发送任务。运行脚本: python3 /root/.openclaw/workspace/scripts/send_daily_journal_card.py",
+        "timeoutSeconds": 120
       },
       "state": {
         "nextRunAtMs": 1772474400000,
@@ -391,7 +173,7 @@
     {
       "id": "journal-send-46967780",
       "agentId": "main",
-      "name": "\u8584\u8377\u65e5\u8bb0-\u53d1\u9001",
+      "name": "薄荷日记-发送",
       "enabled": true,
       "createdAtMs": 1772246967780,
       "updatedAtMs": 1772500800000,
@@ -404,7 +186,8 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "text": "\u6267\u884c\u8584\u8377\u65e5\u8bb0\u53d1\u9001\u4efb\u52a1\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8bfb\u53d6\u4eca\u65e5\u65e5\u8bb0\u6587\u4ef6 memory/YYYY-MM-DD.md\n2. \u53d1\u9001\u5230\u98de\u4e66\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002"
+        "message": "执行日记发送任务。运行脚本: python3 /root/.openclaw/workspace/scripts/send_daily_journal_card.py",
+        "timeoutSeconds": 120
       },
       "state": {
         "nextRunAtMs": 1772496000000,
@@ -425,7 +208,7 @@
     {
       "id": "doctor-check-79000840",
       "agentId": "main",
-      "name": "OpenClaw\u5065\u5eb7\u68c0\u67e5",
+      "name": "OpenClaw健康检查",
       "enabled": true,
       "createdAtMs": 1772279000840,
       "updatedAtMs": 1772500800000,
@@ -438,17 +221,21 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "message": "\u6267\u884cOpenClaw\u5065\u5eb7\u68c0\u67e5\u4efb\u52a1\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8fd0\u884c\u811a\u672c\uff1adoctor_check.sh\n2. \u68c0\u67e5\u7cfb\u7edf\u72b6\u6001\n3. \u63a8\u9001\u7ed3\u679c\u5230\u98de\u4e66\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })\n\n\u6ce8\u610f\uff1a\u5f53\u524d\u914d\u7f6e\u6709\u95ee\u9898\uff0cisolated job\u9700\u8981\u4f7f\u7528 agentTurn \u800c\u4e0d\u662f exec"
+        "message": "执行OpenClaw健康检查任务。\n\n执行步骤：\n1. 运行脚本：doctor_check.sh\n2. 检查系统状态\n3. 推送结果到飞书\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })\n\n注意：当前配置有问题，isolated job需要使用 agentTurn 而不是 exec"
       },
       "state": {
         "nextRunAtMs": 1772419200000,
         "consecutiveErrors": 0
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
       }
     },
     {
       "id": "gateway-restart-80488795",
       "agentId": "main",
-      "name": "Gateway\u6bcf\u5468\u91cd\u542f(\u5e26\u81ea\u6211\u4fee\u590d)",
+      "name": "Gateway每周重启(带自我修复)",
       "enabled": true,
       "createdAtMs": 1772280488795,
       "updatedAtMs": 1772500800000,
@@ -461,17 +248,21 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "message": "\u6267\u884cGateway\u6bcf\u5468\u91cd\u542f\u4efb\u52a1\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8fd0\u884c\u811a\u672c\uff1agateway_restart_with_recovery.sh\n2. \u91cd\u542fGateway\u670d\u52a1\n3. \u68c0\u67e5\u670d\u52a1\u72b6\u6001\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })\n\n\u6ce8\u610f\uff1a\u5f53\u524d\u914d\u7f6e\u6709\u95ee\u9898\uff0cisolated job\u9700\u8981\u4f7f\u7528 agentTurn \u800c\u4e0d\u662f exec"
+        "message": "执行Gateway每周重启任务。\n\n执行步骤：\n1. 运行脚本：gateway_restart_with_recovery.sh\n2. 重启Gateway服务\n3. 检查服务状态\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })\n\n注意：当前配置有问题，isolated job需要使用 agentTurn 而不是 exec"
       },
       "state": {
         "nextRunAtMs": 1772967600000,
         "consecutiveErrors": 0
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
       }
     },
     {
       "id": "weekly-review-81752047",
       "agentId": "main",
-      "name": "\u6bcf\u5468\u81ea\u52a8\u590d\u76d8",
+      "name": "每周自动复盘",
       "enabled": true,
       "createdAtMs": 1772281752047,
       "updatedAtMs": 1772500800000,
@@ -484,17 +275,21 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "message": "\u6267\u884c\u6bcf\u5468\u81ea\u52a8\u590d\u76d8\u4efb\u52a1\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8fd0\u884c\u811a\u672c\uff1aweekly_review.sh\n2. \u751f\u6210\u5468\u590d\u76d8\u62a5\u544a\n3. \u63a8\u9001\u5230\u98de\u4e66\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: \"feishu\" \u53c2\u6570\u3002\n\n\u793a\u4f8b\uff1a\nmessage({ channel: \"feishu\", message: \"\u5185\u5bb9...\" })\n\n\u6ce8\u610f\uff1a\u5f53\u524d\u914d\u7f6e\u6709\u95ee\u9898\uff0cisolated job\u9700\u8981\u4f7f\u7528 agentTurn \u800c\u4e0d\u662f exec"
+        "message": "执行每周自动复盘任务。\n\n执行步骤：\n1. 运行脚本：weekly_review.sh\n2. 生成周复盘报告\n3. 推送到飞书\n\n重要：发送消息时必须使用 channel: \"feishu\" 参数。\n\n示例：\nmessage({ channel: \"feishu\", message: \"内容...\" })\n\n注意：当前配置有问题，isolated job需要使用 agentTurn 而不是 exec"
       },
       "state": {
         "nextRunAtMs": 1772969400000,
         "consecutiveErrors": 0
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
       }
     },
     {
       "id": "us-stock-morning-push-20260305",
       "agentId": "main",
-      "name": "\u7f8e\u80a1\u6536\u76d8\u63a8\u9001",
+      "name": "美股收盘推送",
       "enabled": true,
       "createdAtMs": 1772498940000,
       "updatedAtMs": 1772498940000,
@@ -507,7 +302,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "message": "\u6267\u884c\u7f8e\u80a1\u6536\u76d8\u63a8\u9001\u4efb\u52a1\u3002\u641c\u7d22\u6628\u665a\u7f8e\u80a1\u6536\u76d8\u6570\u636e\uff08\u9053\u743c\u65af\u3001\u7eb3\u65af\u8fbe\u514b\u3001\u6807\u666e500\uff09\uff0c\u83b7\u53d6\u79d1\u6280\u80a1\u548c\u4e2d\u6982\u80a1\uff08\u963f\u91cc\u5df4\u5df4\u7b49\uff09\u6da8\u8dcc\u60c5\u51b5\uff0c\u5206\u6790\u5e02\u573a\u8981\u70b9\u548c\u6da8\u8dcc\u539f\u56e0\uff0c\u6309\u6a21\u677f\u63a8\u9001\u5230\u98de\u4e66\u3002\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u65f6\u5fc5\u987b\u4f7f\u7528 channel: feishu \u53c2\u6570\u3002",
+        "message": "执行美股收盘推送任务。运行脚本: python3 /root/.openclaw/workspace/scripts/fetch_and_send_us_stock.py",
         "timeoutSeconds": 120
       },
       "state": {
@@ -522,8 +317,8 @@
     {
       "id": "dx-pipeline-workflow",
       "agentId": "main",
-      "name": "\u77ed\u7ebf\u60c5\u7eea\u7814\u5224-\u5de5\u4f5c\u6d41",
-      "enabled": true,
+      "name": "短线情绪研判-工作流",
+      "enabled": false,
       "createdAtMs": 1772500800000,
       "updatedAtMs": 1772500800000,
       "schedule": {
@@ -535,11 +330,114 @@
       "wakeMode": "now",
       "payload": {
         "kind": "systemEvent",
-        "text": "\u6267\u884c\u77ed\u7ebf\u60c5\u7eea\u7814\u5224\u5de5\u4f5c\u6d41\u3002\n\n\u6267\u884c\u6b65\u9aa4\uff1a\n1. \u8fd0\u884c master_pipeline.py\n2. \u987a\u5e8f\u6267\u884c\uff1a\u6570\u636e\u6293\u53d6 -> AI\u5206\u6790 -> \u90e8\u7f72\u53d1\u5e03\n3. \u6bcf\u4e2a\u5b50\u4efb\u52a1\u72ec\u7acb\u901a\u77e5\n4. \u4efb\u4e00\u5931\u8d25\u505c\u6b62\u5e76\u901a\u77e5\n\n\u91cd\u8981\uff1a\u53d1\u9001\u6d88\u606f\u5fc5\u987b\u4f7f\u7528 channel: feishu",
+        "text": "【强制步骤】执行短线情绪研判前必须完成：\n\n第0步：读取文档\n1. 打开 /root/.openclaw/workspace/stock/dx/TASK_DX_FINAL.md\n2. 完整阅读9步流程\n3. 打开 /root/.openclaw/workspace/stock/dx/CHECKLIST_9STEPS.md\n4. 确认7个纠正的问题\n5. 回复：\"已读文档，确认理解9步流程\"\n\n第1-9步：按文档执行\n- 每步执行前对照文档\n- 每步执行后检查输出\n- 不一致立即停止\n\n不完成第0步，禁止执行第1步。",
         "timeoutSeconds": 900
       },
       "state": {
         "nextRunAtMs": 1772512800000
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "stock-ma50-pipeline",
+      "agentId": "main",
+      "name": "个股数据+MA50工作流",
+      "enabled": false,
+      "createdAtMs": 1772500800000,
+      "updatedAtMs": 1772500800000,
+      "schedule": {
+        "kind": "cron",
+        "expr": "5 16 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "main",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "systemEvent",
+        "text": "执行个股数据+MA50工作流。\n\n执行步骤：\n1. 运行 stock_ma50_pipeline.py\n2. 顺序执行：个股数据抓取 -> MA50计算\n3. 每个脚本保持原有通知方式\n4. 个股数据失败则停止\n\n重要：发送消息必须使用 channel: feishu",
+        "timeoutSeconds": 600
+      },
+      "state": {
+        "nextRunAtMs": 1772438700000
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "skill-search-daily",
+      "agentId": "main",
+      "name": "每日Skill搜索",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 22 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "main",
+      "payload": {
+        "kind": "systemEvent",
+        "text": "搜索ClawHub最热门Skill，找一个汇报"
+      },
+      "wakeMode": "now",
+      "state": {
+        "nextRunAtMs": 1772546400000
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "status-web-morning-push",
+      "agentId": "main",
+      "name": "Status Web-早晨状态推送",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "expr": "20 7 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "main",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "systemEvent",
+        "text": "调用status-web API获取今日任务和系统状态，整理后推送给用户"
+      },
+      "state": {
+        "nextRunAtMs": 1772739600000
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu"
+      },
+      "announce": true
+    },
+    {
+      "id": "status-web-health-check",
+      "agentId": "main",
+      "name": "Status Web-异常监控",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "expr": "*/5 * * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "main",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "systemEvent",
+        "text": "运行status_monitor.sh检查系统健康，如有异常立即通知用户"
+      },
+      "state": {
+        "nextRunAtMs": 1772706000000
       },
       "delivery": {
         "mode": "announce",

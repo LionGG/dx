@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "lark-card-sender": {
+      "name": "飞书卡片消息",
+      "zip_url": "https://lightmake.site/api/v1/download?slug=lark-card-sender",
+      "source": "skillhub",
+      "version": "1.0.0"
+    }
+  }
+}

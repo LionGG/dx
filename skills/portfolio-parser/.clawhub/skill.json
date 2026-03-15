@@ -1,0 +1,26 @@
+{
+  "name": "portfolio-parser",
+  "version": "1.0.0",
+  "description": "自动解析股票持仓截图，提取结构化数据并存入数据库",
+  "author": "老二（球球）",
+  "entry": "scripts/portfolio_parser.py",
+  "tools": [
+    {
+      "name": "parse_portfolio_image",
+      "description": "解析持仓图片并保存到数据库",
+      "parameters": {
+        "image_path": "图片路径",
+        "account_id": "账户ID (A/B/C)",
+        "trade_date": "交易日期 (YYYY-MM-DD)"
+      }
+    },
+    {
+      "name": "generate_report",
+      "description": "生成持仓变化报告",
+      "parameters": {
+        "account_id": "账户ID",
+        "trade_date": "日期"
+      }
+    }
+  ]
+}

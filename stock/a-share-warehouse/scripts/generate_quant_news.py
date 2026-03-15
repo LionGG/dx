@@ -47,16 +47,17 @@ def generate_quant_news():
     return message
 
 def send_to_feishu(message):
-    """发送到飞书个人"""
+    """发送到飞书个人（宝总）"""
     try:
-        # 使用message工具直接发送给宝总
+        # 使用message工具直接发送给宝总个人
         import subprocess
         import json
         
-        # 调用OpenClaw message工具
+        # 调用OpenClaw message工具 - 明确发送到个人
         cmd = [
             "openclaw", "message", "send",
             "--channel", "feishu",
+            "-t", "ou_7b3b64c0a18c735401f4e1d172d4c802",  # 宝总个人ID
             "--message", message
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
